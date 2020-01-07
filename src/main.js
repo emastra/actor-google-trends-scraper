@@ -87,8 +87,6 @@ Apify.main(async () => {
                     return !!widget.querySelector('p.widget-error-title');
                 });
 
-                console.log(searchTerm, 'hasNoData:', hasNoData);
-
                 // if no data, push message and return!
                 if (hasNoData) {
                     if (!spreadsheetId) {

@@ -24,7 +24,7 @@ function validateInput(input) {
     };
 
     // check required field
-    if (!input.searchTerms && input.searchTerms.length <= 0 && !input.spreadsheetId) {
+    if (input.searchTerms.length <= 0 && !input.spreadsheetId) {
         throw new Error('At least "searchTerms" or "spreadsheetId" must be provided as INPUT.');
     }
 

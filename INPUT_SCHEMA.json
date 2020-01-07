@@ -1,0 +1,42 @@
+{
+  "title": "Google Trends input schema",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "searchTerms": {
+        "title": "Search terms",
+        "type": "array",
+        "editor": "stringList",
+        "description": "(Required if 'spreadsheetId' is not provided) List of search terms to be scraped.",
+        "example": [ "CNN", "BBC", "Al Jazeera" ]
+    },
+    "spreadsheetId": {
+        "title": "Spreadsheet id",
+        "type": "string",
+        "description": "(Optional) Id of the google sheet from where search terms will be loaded.\n Spreadsheet must have only one column. Row 1 is considered the title of the column so it will not be loaded as a search term. Check the actor documentation for more info.",
+        "editor": "textfield"
+    },
+    "maxItems": {
+        "title": "Max items",
+        "type": "integer",
+        "minimum": 0,
+        "description": "Limit of product items to be scraped. Zero value means no limit.",
+        "default": 0
+    },
+    "extendOutputFunction": {
+        "title": "Extend output function",
+        "type": "string",
+        "editor": "javascript",
+        "description": "A function which result will get merged with the default result. It must return an object.",
+        "example": "($) => {\n    const result = {};\n    // Uncomment to add an extra field to each item of the output\n    // result.extraField = 'Test field';\n\n    return result;\n}",
+        "sectionCaption": "Advanced options"
+    },
+    "proxyConfiguration": {
+        "title": "Proxy configuration",
+        "type": "object",
+        "editor": "proxy",
+        "description": "The best option is usually Automatic proxy, but you can also use your own proxies or no proxy. It defaults to useApifyProxy. Country defaults to 'US'.",
+        "prefill": { "useApifyProxy": true }
+    }
+  }
+}

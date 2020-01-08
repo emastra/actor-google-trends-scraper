@@ -46,22 +46,12 @@ INPUT Example:
 ### Output
 
 Output is stored in a dataset.
+Each item will contain the search term and all values keyed by the corresponding date.
 
-If no spreadsheet ID is provided, the output will have an item for each piece of data.
-Example:
+Example of one output item:
 ```
 {
   "searchTerm": "CNN",
-  "date": "‪Feb 10, 2019‬",
-  "value": 80
-}
-```
-
-If spreadsheet ID is provided, the output will have a different format: one item for each search term which will contain all data about the search term. This way you can download the output as a nicely formatted spreadsheet from the *dataset* tab of your actor run.
-Example:
-```
-{
-  "Term / Date": "CNN",
   "‪Jan 13, 2019‬": 92,
   "‪Jan 20, 2019‬": 100,
   "‪Jan 27, 2019‬": 86,
@@ -69,6 +59,8 @@ Example:
   ...
 }
 ```
+
+You may download the output as a nicely formatted spreadsheet from the *dataset* tab of your actor run.
 
 ### Extend output function
 

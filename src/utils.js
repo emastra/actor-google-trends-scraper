@@ -97,7 +97,7 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId) {
     }
 
     // grab the name of the custom column title
-    const sheetTitle = spreadsheetId ? Object.keys(output[0])[0] : null;
+    const sheetTitle = spreadsheetId ? Object.keys(output[0])[0] : 'Term / Date';
 
     return { sources, sheetTitle };
 }

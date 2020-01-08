@@ -89,18 +89,11 @@ Apify.main(async () => {
 
                 // if no data, push message and return!
                 if (hasNoData) {
-                    if (!spreadsheetId) {
-                        await Apify.pushData({
-                            searchTerm,
-                            message: 'The search term displays no data.'
-                        });
-                    } else {
-                        const resObject = Object.create(null);
-                        resObject[sheetTitle] = searchTerm;
-                        resObject.message = 'The search term displays no data.';
+                    const resObject = Object.create(null);
+                    resObject[sheetTitle] = searchTerm;
+                    resObject.message = 'The search term displays no data.';
 
-                        await Apify.pushData(resObject);
-                    }
+                    await Apify.pushData(resObject);
 
                     log.info(`The search term "${searchTerm}" displays no data.`);
                     return;
@@ -128,28 +121,18 @@ Apify.main(async () => {
                     return results;
                 });
 
-                // push data. Item format is different if spreadsheetId is present
-                if (!spreadsheetId) {
-                    for (const res of results) {
-                        await Apify.pushData({
-                            searchTerm,
-                            date: res[0],
-                            value: Number(res[1])
-                        });
-                    }
-                } else {
-                    const resObject = Object.create(null);
-                    resObject[sheetTitle] = searchTerm;
+                // Prepare object to be pushed
+                const resObject = Object.create(null);
+                resObject[sheetTitle] = searchTerm;
 
-                    for (const res of results) {
-                        // res[0] holds the date, res[1] holds the value
-                        // the date will be the name of the column when dataset is exported to spreadsheet
-                        resObject[res[0]] = Number(res[1]);
-                    }
-
-                    await Apify.pushData(resObject);
+                for (const res of results) {
+                    // res[0] holds the date, res[1] holds the value. The date will be the name of the column when dataset is exported to spreadsheet
+                    resObject[res[0]] = Number(res[1]);
                 }
 
+                // push, increase itemCount, log
+                await Apify.pushData(resObject);
+                itemCount++;
                 log.info(`Results for "${searchTerm}" pushed successfully.`);
             }
         },
@@ -168,10 +151,11 @@ Apify.main(async () => {
 
     log.info('Crawler Finished.');
 
-    if (spreadsheetId)
+    if (spreadsheetId) {
         log.info(`
             You can get the results as usual,
             or download them in spreadsheet format under the 'dataset' tab of your actor run.
             More info in the actor documentation.
         `);
+    }
 });

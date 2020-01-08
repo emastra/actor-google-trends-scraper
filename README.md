@@ -18,7 +18,7 @@ Google Trends Scraper is an [Apify actor](https://apify.com/actors) for extracti
 | proxyConfiguration | object | (optional) Proxy settings of the run. If you have access to Apify proxy, leave the default settings. If not, you can set `{ "useApifyProxy": false" }` to disable proxy usage |
 
 **Notes on the input as a spreadsheet**
-- Currently the only spreadsheet allowed is a Google sheet.
+- The only spreadsheet allowed is a Google sheet.
 - Spreadsheet must have only one column.
 - The first row of the spreadsheet is considered the title of the column so it will not be loaded as a search term.
 

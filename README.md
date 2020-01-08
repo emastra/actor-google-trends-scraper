@@ -21,7 +21,7 @@ Google Trends Scraper is an [Apify actor](https://apify.com/actors) for extracti
 - Currently the only spreadsheet allowed is a Google sheet.
 - Spreadsheet must have only one column.
 - The first row of the spreadsheet is considered the title of the column so it will not be loaded as a search term.
-- Google sheet example:
+- Google sheet example:\n
 ![google sheet example](./google-sheet-example.png)
 
 INPUT Example:

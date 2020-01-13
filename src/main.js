@@ -18,13 +18,11 @@ Apify.main(async () => {
     const {
         searchTerms,
         spreadsheetId,
-        isPublic,
+        isPublic = false,
         maxItems = null,
         extendOutputFunction = null,
         proxyConfiguration,
     } = input;
-
-    log.info('Is spreadsheet public:', isPublic);
 
     // create proxy url(s) to be used in crawler configuration
     const proxyUrl = getProxyUrl(proxyConfiguration, true);

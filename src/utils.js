@@ -60,7 +60,7 @@ function getProxyUrl(proxyConfiguration, addSession) {
     return proxyUrl;
 }
 
-async function checkAndCreateUrlSource(searchTerms, spreadsheetId) {
+async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic) {
     const sources = [];
     let output;
 
@@ -74,12 +74,12 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId) {
     if (spreadsheetId) {
         log.info('Importing spreadsheet...');
         const run = await Apify.call('lukaskrivka/google-sheets', {
-          "mode": "read",
-          "spreadsheetId": spreadsheetId,
-          "publicSpreadsheet": true,
-          "deduplicateByEquality": false,
-          "createBackup": false,
-          // "tokensStore": "google-oauth-tokens"
+          mode: "read",
+          spreadsheetId: spreadsheetId,
+          publicSpreadsheet: isPublic,
+          deduplicateByEquality: false,
+          createBackup: false,
+          // tokensStore: "google-oauth-tokens" // default
         });
 
         output = run.output.body;

@@ -16,6 +16,13 @@
         "description": "(Optional) Id of the google sheet from where search terms will be loaded.\n Spreadsheet must have only one column. Row 1 is considered the title of the column so it will not be loaded as a search term. Check the actor documentation for more info.",
         "editor": "textfield"
     },
+    "isPublic": {
+        "title": "Is public",
+        "type": "boolean",
+        "editor": "checkbox",
+        "description": "If checked you can import a public spreadsheet without need for authorization. For importing private sheets, please read about authorization in the actor documentation.",
+        "default": true
+    },
     "maxItems": {
         "title": "Max items",
         "type": "integer",

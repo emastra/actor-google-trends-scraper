@@ -18,17 +18,20 @@ Apify.main(async () => {
     const {
         searchTerms,
         spreadsheetId,
+        isPublic,
         maxItems = null,
         extendOutputFunction = null,
         proxyConfiguration,
     } = input;
+
+    log.info('Is spreadsheet public:', isPublic);
 
     // create proxy url(s) to be used in crawler configuration
     const proxyUrl = getProxyUrl(proxyConfiguration, true);
     const userAgent = proxyUrl ? Apify.utils.getRandomUserAgent() : undefined;
 
     // initialize request list from url sources
-    const { sources, sheetTitle } = await checkAndCreateUrlSource(searchTerms, spreadsheetId);
+    const { sources, sheetTitle } = await checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic);
     const requestList = await Apify.openRequestList('start-list', sources);
 
     // open request queue

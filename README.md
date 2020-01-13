@@ -4,6 +4,7 @@ Google Trends Scraper is an [Apify actor](https://apify.com/actors) for extracti
 
 - [Input](#input)
 - [Output](#output)
+- [Authorization](#authorization)
 - [Extend output function](#extend-output-function)
 - [Open an issue](#open-an-issue)
 
@@ -13,6 +14,7 @@ Google Trends Scraper is an [Apify actor](https://apify.com/actors) for extracti
 | ----- | ---- | ----------- |
 | searchTerms | array | (Required if 'spreadsheetId' is not provided) List of search terms to be scraped. |
 | spreadsheetId | string | (Optional) Id of the google sheet from where search terms will be loaded. |
+| isPublic | boolean | If checked you can import a public spreadsheet without need for authorization. For importing private sheets, please read about authorization below. Defaults to `false`.
 | maxItems | number | (optional) Maximum number of product items to be scraped |
 | extendOutputFunction | string | (optional) Function that takes a JQuery handle ($) as argument and returns data that will be merged with the default output. More information in [Extend output function](#extend-output-function) |
 | proxyConfiguration | object | (optional) Proxy settings of the run. If you have access to Apify proxy, leave the default settings. If not, you can set `{ "useApifyProxy": false" }` to disable proxy usage |
@@ -35,6 +37,7 @@ INPUT Example:
     "another test term"
   ],
   "spreadsheetId": "1Dkf0VahLpp5tD6DOsopL7O-Nm7qD16Ie6VK_R9rt5p8",
+  "isPublic": true,
   "maxItems": 100,
   "extendOutputFunction": "($) => { return { test: 1234, test2: 5678 } }",
   "proxyConfiguration": {
@@ -42,6 +45,15 @@ INPUT Example:
   }
 }
 ```
+
+### Authorization
+
+Authorization is needed only if your Google sheet is private.
+Google Trends Scraper internally runs [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization). The authorization process needs to be done running this actor separately in your account. After running it one time, the actor will save a token in your KV store and Google Trends Scraper will use it automatically. This means that after running [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization) one time, you can fully automate the Google Trends Scraper actor without thinking about authorization anymore.
+
+Please check this [article](https://help.apify.com/en/articles/2424053-google-integration) for instructions on how to authorize using [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization).
+
+If you want to use more spreadsheets from different Google accounts, then each Google account needs to have a different tokensStore. You need to track which tokens belong to which account by naming the store properly.
 
 ### Output
 

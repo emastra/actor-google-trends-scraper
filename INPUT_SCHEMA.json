@@ -21,7 +21,7 @@
         "type": "boolean",
         "editor": "checkbox",
         "description": "If checked you can import a public spreadsheet without need for authorization. For importing private sheets, please read about authorization in the actor documentation.",
-        "default": true
+        "default": false
     },
     "maxItems": {
         "title": "Max items",

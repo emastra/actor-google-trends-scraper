@@ -76,9 +76,10 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId) {
         const run = await Apify.call('lukaskrivka/google-sheets', {
           "mode": "read",
           "spreadsheetId": spreadsheetId,
+          "publicSpreadsheet": true,
           "deduplicateByEquality": false,
           "createBackup": false,
-          "tokensStore": "google-oauth-tokens"
+          // "tokensStore": "google-oauth-tokens"
         });
 
         output = run.output.body;

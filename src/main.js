@@ -53,7 +53,7 @@ Apify.main(async () => {
             proxyUrl: proxyUrl,
             userAgent: userAgent,
             timeout: 120 * 1000,
-            headless: true
+            headless: false
         },
 
         gotoFunction: async ({ request, page }) => {

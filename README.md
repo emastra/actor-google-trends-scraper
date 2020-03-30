@@ -109,7 +109,7 @@ Examples:
 2019-03-20 2019-03-26
 ```
 
-When the range is up to 7 days, each date supports the time as well. 
+Only when the range is up to 7 days, each date supports the time as well. 
 Examples:
 ```
 2020-03-24T08 2020-03-29T15

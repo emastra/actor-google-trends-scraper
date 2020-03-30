@@ -75,7 +75,7 @@
         "customTimeRange": {
             "title": "Custom time range",
             "type": "string",
-            "description": "Provide a custom time range. Read the documentation for correct syntax and examples.",
+            "description": "Provide a custom time range. If provided, it takes precedence over regular timeRange. Read the documentation for correct format and examples.",
             "editor": "textfield",
             "sectionCaption": "Advanced options"
         },

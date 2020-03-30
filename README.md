@@ -5,6 +5,7 @@ Google Trends Scraper is an [Apify actor](https://apify.com/actors) for extracti
 - [Input](#input)
 - [Output](#output)
 - [Authorization](#authorization)
+- [Custom time range](#custom-time-range)
 - [Extend output function](#extend-output-function)
 - [Open an issue](#open-an-issue)
 
@@ -14,8 +15,11 @@ Google Trends Scraper is an [Apify actor](https://apify.com/actors) for extracti
 | ----- | ---- | ----------- |
 | searchTerms | array | (Required if 'spreadsheetId' is not provided) List of search terms to be scraped. |
 | spreadsheetId | string | (Optional) Id of the google sheet from where search terms will be loaded. |
-| isPublic | boolean | If checked you can import a public spreadsheet without need for authorization. For importing private sheets, please read about authorization below. Defaults to `false`.
+| isPublic | boolean | If checked you can import a public spreadsheet without need for authorization. For importing private sheets, please read about authorization below. Defaults to `false`. |
+| timeRange | string | Choose a predefined search's time range (defaults to 'Past 12 months') |
+| category | string | Choose a category to filter the search for (defaults to 'All categories') |
 | maxItems | number | (optional) Maximum number of product items to be scraped |
+| customTimeRange | string | Provide a custom time range. If provided, it takes precedence over regular timeRange. Read [Custom time range](#custom-time-range) for correct format and examples. |
 | extendOutputFunction | string | (optional) Function that takes a JQuery handle ($) as argument and returns data that will be merged with the default output. More information in [Extend output function](#extend-output-function) |
 | proxyConfiguration | object | (optional) Proxy settings of the run. If you have access to Apify proxy, leave the default settings. If not, you can set `{ "useApifyProxy": false" }` to disable proxy usage |
 
@@ -73,6 +77,26 @@ Example of one output item:
 ```
 
 You may download the output as a nicely formatted spreadsheet from the *dataset* tab of your actor run.
+
+### Custom time range
+Custom time range is a string with the following order:\
+`startDate endDate`\
+And the following format:\
+`YYYY-MM-DD YYYY-MM-DD`
+
+Examples:
+```
+2020-01-30 2020-03-29
+```
+```
+2019-03-24 2019-03-29
+```
+
+When the range is up to 7 days, each date supports the time as well. 
+Examples:
+```
+2020-03-24T08 2020-03-30T15
+```
 
 ### Extend output function
 

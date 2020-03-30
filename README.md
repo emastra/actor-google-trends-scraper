@@ -40,7 +40,7 @@ If you provide the INPUT as JSON, these are the `timeRange` possible values:<br/
 `now 1-d` (equals to Past day)<br/>
 `now 7-d` (equals to Past 7 days)<br/>
 `today 1-m` (equals to Past 30 days)<br/>
-`today 3-m` (equals to `Past 90 days`)<br/>
+`today 3-m` (equals to Past 90 days)<br/>
 `''` (empty string equals to Past 12 months. It's the default)<br/>
 `today 5-y` (equals to Past 5 years)<br/>
 `all` (equals to 2004-present)

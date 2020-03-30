@@ -32,7 +32,22 @@ Google sheet example:
 
 ![google sheet example](./google-sheet-example.png)
 
-INPUT Example:
+**Notes on timeRange**\
+On the Apify platform you can choose the time range from a select menu. 
+If you provide the INPUT as JSON, these are the `timeRange` possible values:
+```
+`now 1-H` (equals to Past hour)
+`now 4-H` (equals to Past 4 hours)
+`now 1-d` (equals to Past day)
+`now 7-d` (equals to Past 7 days)
+`today 1-m` (equals to Past 30 days)
+`today 3-m` (equals to `Past 90 days`)
+`` (empty string equals to Past 12 months. It's the default)
+`today 5-y` (equals to Past 5 years)
+`all` (equals to 2004-present)
+```
+
+**INPUT Example:**
 
 ```
 {
@@ -40,9 +55,11 @@ INPUT Example:
     "test term",
     "another test term"
   ],
-  "spreadsheetId": "1Dkf0VahLpp5tD6DOsopL7O-Nm7qD16Ie6VK_R9rt5p8",
+  "spreadsheetId": spreadsheetId,
+  "timeRange": "now 4-H", 
   "isPublic": true,
   "maxItems": 100,
+  "customTimeRange": "2020-03-24 2020-03-29",
   "extendOutputFunction": "($) => { return { test: 1234, test2: 5678 } }",
   "proxyConfiguration": {
     "useApifyProxy": true
@@ -89,13 +106,13 @@ Examples:
 2020-01-30 2020-03-29
 ```
 ```
-2019-03-24 2019-03-29
+2019-03-20 2019-03-26
 ```
 
 When the range is up to 7 days, each date supports the time as well. 
 Examples:
 ```
-2020-03-24T08 2020-03-30T15
+2020-03-24T08 2020-03-29T15
 ```
 
 ### Extend output function

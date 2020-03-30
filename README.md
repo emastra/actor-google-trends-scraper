@@ -34,18 +34,16 @@ Google sheet example:
 
 **Notes on timeRange**\
 On the Apify platform you can choose the time range from a select menu. 
-If you provide the INPUT as JSON, these are the `timeRange` possible values:
-```
-`now 1-H` (equals to Past hour)
-`now 4-H` (equals to Past 4 hours)
-`now 1-d` (equals to Past day)
-`now 7-d` (equals to Past 7 days)
-`today 1-m` (equals to Past 30 days)
-`today 3-m` (equals to `Past 90 days`)
-`` (empty string equals to Past 12 months. It's the default)
-`today 5-y` (equals to Past 5 years)
-`all` (equals to 2004-present)
-```
+If you provide the INPUT as JSON, these are the `timeRange` possible values:\
+`now 1-H` (equals to Past hour)\
+`now 4-H` (equals to Past 4 hours)\
+`now 1-d` (equals to Past day)\
+`now 7-d` (equals to Past 7 days)\
+`today 1-m` (equals to Past 30 days)\
+`today 3-m` (equals to `Past 90 days`)\
+`` (empty string equals to Past 12 months. It's the default)\
+`today 5-y` (equals to Past 5 years)\
+`all` (equals to 2004-present)\
 
 **INPUT Example:**
 

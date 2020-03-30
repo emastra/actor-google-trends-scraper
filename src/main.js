@@ -1,5 +1,6 @@
 const Apify = require('apify');
 const { log } = Apify.utils;
+const querystring = require('querystring');
 
 const {
     validateInput,
@@ -19,7 +20,10 @@ Apify.main(async () => {
         searchTerms,
         spreadsheetId,
         isPublic = false,
+        timeRange,
+        category,
         maxItems = null,
+        customTimeRange = null,
         extendOutputFunction = null,
         proxyConfiguration,
     } = input;
@@ -29,7 +33,7 @@ Apify.main(async () => {
     const userAgent = proxyUrl ? Apify.utils.getRandomUserAgent() : undefined;
 
     // initialize request list from url sources
-    const { sources, sheetTitle } = await checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic);
+    const { sources, sheetTitle } = await checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, timeRange, category, customTimeRange);
     const requestList = await Apify.openRequestList('start-list', sources);
 
     // open request queue
@@ -74,7 +78,9 @@ Apify.main(async () => {
             //
 
             if (label === 'START') {
-                const searchTerm = decodeURIComponent(request.url.split('?')[1].split('=')[1]);
+                // const searchTerm = decodeURIComponent(request.url.split('?')[1].split('=')[1]);
+                const queryStringObj = querystring.parse(request.url.split('?')[1]);
+                const searchTerm = queryStringObj.q;
 
                 const is429 = await page.evaluate(() => !!document.querySelector('div#af-error-container'));
                 if (is429) {

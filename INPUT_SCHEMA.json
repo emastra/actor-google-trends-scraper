@@ -1,49 +1,99 @@
 {
-  "title": "Google Trends input schema",
-  "type": "object",
-  "schemaVersion": 1,
-  "properties": {
-    "searchTerms": {
-        "title": "Search terms",
-        "type": "array",
-        "editor": "stringList",
-        "description": "(Required if 'spreadsheetId' is not provided) List of search terms to be scraped.",
-        "example": [ "CNN", "BBC", "Al Jazeera" ]
-    },
-    "spreadsheetId": {
-        "title": "Spreadsheet id",
-        "type": "string",
-        "description": "(Optional) Id of the google sheet from where search terms will be loaded.\n Spreadsheet must have only one column. Row 1 is considered the title of the column so it will not be loaded as a search term. Check the actor documentation for more info.",
-        "editor": "textfield"
-    },
-    "isPublic": {
-        "title": "Is public",
-        "type": "boolean",
-        "editor": "checkbox",
-        "description": "If checked you can import a public spreadsheet without need for authorization. For importing private sheets, please read about authorization in the actor documentation.",
-        "default": false
-    },
-    "maxItems": {
-        "title": "Max items",
-        "type": "integer",
-        "minimum": 0,
-        "description": "Limit of product items to be scraped. Zero value means no limit.",
-        "default": 0
-    },
-    "extendOutputFunction": {
-        "title": "Extend output function",
-        "type": "string",
-        "editor": "javascript",
-        "description": "A function which result will get merged with the default result. It must return an object.",
-        "example": "($) => {\n    const result = {};\n    // Uncomment to add an extra field to each item of the output\n    // result.extraField = 'Test field';\n\n    return result;\n}",
-        "sectionCaption": "Advanced options"
-    },
-    "proxyConfiguration": {
-        "title": "Proxy configuration",
-        "type": "object",
-        "editor": "proxy",
-        "description": "The best option is usually Automatic proxy, but you can also use your own proxies or no proxy. It defaults to useApifyProxy. Country defaults to 'US'.",
-        "prefill": { "useApifyProxy": true }
+    "title": "Google Trends input schema",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "searchTerms": {
+            "title": "Search terms",
+            "type": "array",
+            "editor": "stringList",
+            "description": "(Required if 'spreadsheetId' is not provided) List of search terms to be scraped.",
+            "example": [ "CNN", "BBC", "Al Jazeera" ]
+        },
+        "spreadsheetId": {
+            "title": "Spreadsheet id",
+            "type": "string",
+            "description": "(Optional) Id of the google sheet from where search terms will be loaded.\n Spreadsheet must have only one column. Row 1 is considered the title of the column so it will not be loaded as a search term. Check the actor documentation for more info.",
+            "editor": "textfield"
+        },
+        "isPublic": {
+            "title": "Is public",
+            "type": "boolean",
+            "editor": "checkbox",
+            "description": "If checked you can import a public spreadsheet without need for authorization. For importing private sheets, please read about authorization in the actor documentation.",
+            "default": false
+        },
+        "timeRange": {
+            "title": "Time range",
+            "type": "string",
+            "description": "Choose a predefined search's time range (defaults to 'Past 12 months')",
+            "editor": "select",
+            "default": "",
+            "enumTitles": [
+                "Past 12 months (output frequency: 7 days)", 
+                "Past hour (output frequency: 1 minute)", 
+                "Past 4 hours (output frequency: 1 minute)", 
+                "Past day (output frequency: 8 minutes)", 
+                "Past 7 days (output frequency: 1 hour)", 
+                "Past 30 days (output frequency: 1 day)", 
+                "Past 90 days (output frequency: 1 day)", 
+                "Past 5 years (output frequency: 7 days)", 
+                "2004 - present (output frequency: 1 month)"
+            ],
+            "enum": [
+                "", 
+                "now 1-H", 
+                "now 4-H", 
+                "now 1-d", 
+                "now 7-d", 
+                "today 1-m", 
+                "today 3-m", 
+                "today 5-y", 
+                "all"
+            ],
+            "prefill": ""
+        },
+        "category": {
+            "title": "Category",
+            "type": "string",
+            "description": "Choose a category to filter the search for (defaults to 'All categories')",
+            "editor": "select",
+            "default": "",
+            "enumTitles": ["All categories", "Arts & Entertainment", "Autos & Vehicles", "Beauty & Fitness", "Books & Literature", "Business & Industrial", "Computers & Electronics", 
+                "Finance", "Food & Drink", "Games", "Health", "Hobbies & Leisure", "Home & Garden", "Internet & Telecom", "Jobs & Education", "Law & Government", "News",
+                "Online Communities", "People & Society", "Pets & Animals", "Property", "Reference", "Science", "Shopping", "Sports", "Travel"],
+            "enum": ["", "3", "47", "44", "22", "12", "5", "7", "71", "8", "45", "65", "11", "13", "958", "19", 
+                "16", "299", "14", "66", "29", "533", "174", "18", "20", "67"]
+        },
+        "maxItems": {
+            "title": "Max items",
+            "type": "integer",
+            "minimum": 0,
+            "description": "Limit of product items to be scraped. Zero value means no limit.",
+            "default": 0
+        },
+        "customTimeRange": {
+            "title": "Custom time range",
+            "type": "string",
+            "description": "Provide a custom time range. Read the documentation for correct syntax and examples.",
+            "editor": "textfield",
+            "sectionCaption": "Advanced options"
+        },
+        "extendOutputFunction": {
+            "title": "Extend output function",
+            "type": "string",
+            "editor": "javascript",
+            "description": "A function which result will get merged with the default result. It must return an object.",
+            "example": "($) => {\n    const result = {};\n    // Uncomment to add an extra field to each item of the output\n    // result.extraField = 'Test field';\n\n    return result;\n}"
+        },
+        "proxyConfiguration": {
+            "title": "Proxy configuration",
+            "type": "object",
+            "editor": "proxy",
+            "description": "The best option is usually Automatic proxy, but you can also use your own proxies or no proxy. It defaults to useApifyProxy. Country defaults to 'US'.",
+            "prefill": {
+                "useApifyProxy": true
+            }
+        }
     }
-  }
 }

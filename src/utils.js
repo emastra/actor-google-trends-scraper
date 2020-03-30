@@ -60,13 +60,24 @@ function getProxyUrl(proxyConfiguration, addSession) {
     return proxyUrl;
 }
 
-async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic) {
+async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, timeRange, category, customTimeRange) {
     const sources = [];
     let output;
 
+    const timeRangeToUse = customTimeRange ? customTimeRange : timeRange;
+
     if (searchTerms) {
         for (const searchTerm of searchTerms) {
-            const url = BASE_URL + `?q=${encodeURIComponent(searchTerm)}`
+            let url = BASE_URL + `?q=${encodeURIComponent(searchTerm)}`;
+
+            if (timeRangeToUse) {
+                url = url + `&date=${encodeURIComponent(timeRangeToUse)}`;
+            }
+
+            if (category) {
+                url = url + `&cat=${category}`;
+            }
+
             sources.push({ url, userData: { label: 'START' } });
         }
     }

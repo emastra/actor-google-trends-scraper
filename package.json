@@ -3,8 +3,7 @@
 	"version": "0.0.1",
 	"description": "Google trends scraper",
 	"dependencies": {
-		"apify": "^0.17.0",
-		"moment": "^2.24.0"
+		"apify": "^0.17.0"
 	},
 	"devDependencies": {
 		"@apify/eslint-config": "0.0.3",

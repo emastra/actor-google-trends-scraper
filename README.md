@@ -30,7 +30,7 @@ Google Trends Scraper is an [Apify actor](https://apify.com/actors) for extracti
 
 Google sheet example:
 
-![google sheet example](./google-sheet-example.png)
+![google sheet example](https://drive.google.com/open?id=1IP4Dqa1rxxdI82jGcB05ETg0DtRNnMgM)
 
 **Notes on timeRange**\
 On the Apify platform you can choose the time range from a select menu. 

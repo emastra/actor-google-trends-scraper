@@ -30,7 +30,7 @@ Google Trends Scraper is an [Apify actor](https://apify.com/actors) for extracti
 
 Google sheet example:
 
-![google sheet example](https://drive.google.com/open?id=1IP4Dqa1rxxdI82jGcB05ETg0DtRNnMgM)
+![google sheet example](https://github.com/emastra/actor-google-trends-scraper/blob/master/google-sheet-example.png)
 
 **Notes on timeRange**\
 On the Apify platform you can choose the time range from a select menu. 
@@ -67,15 +67,6 @@ If you provide the INPUT as JSON, these are the `timeRange` possible values:<br 
 }
 ```
 
-### Authorization
-
-Authorization is needed only if your Google sheet is private.
-Google Trends Scraper internally runs [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization). The authorization process needs to be done running this actor separately in your account. After running it one time, the actor will save a token in your KV store and Google Trends Scraper will use it automatically. This means that after running [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization) one time, you can fully automate the Google Trends Scraper actor without thinking about authorization anymore.
-
-Please check this [article](https://help.apify.com/en/articles/2424053-google-integration) for instructions on how to authorize using [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization).
-
-If you want to use more spreadsheets from different Google accounts, then each Google account needs to have a different tokensStore. You need to track which tokens belong to which account by naming the store properly.
-
 ### Output
 
 Output is stored in a dataset.
@@ -93,9 +84,19 @@ Example of one output item:
 }
 ```
 
+### Authorization
+
+Authorization is needed only if your Google sheet is private.
+Google Trends Scraper internally runs [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization). The authorization process needs to be done running this actor separately in your account. After running it one time, the actor will save a token in your KV store and Google Trends Scraper will use it automatically. This means that after running [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization) one time, you can fully automate the Google Trends Scraper actor without thinking about authorization anymore.
+
+Please check this [article](https://help.apify.com/en/articles/2424053-google-integration) for instructions on how to authorize using [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization).
+
+If you want to use more spreadsheets from different Google accounts, then each Google account needs to have a different tokensStore. You need to track which tokens belong to which account by naming the store properly.
+
 You may download the output as a nicely formatted spreadsheet from the *dataset* tab of your actor run.
 
 ### Custom time range
+
 Custom time range is a string with the following order:\
 `startDate endDate`\
 And the following format:\

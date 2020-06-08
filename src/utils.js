@@ -2,7 +2,7 @@ const Apify = require('apify');
 
 const { log } = Apify.utils;
 
-const { BASE_URL, PROXY_DEFAULT_COUNTRY, GEOLOCATIONS } = require('./constants');
+const { BASE_URL, PROXY_DEFAULT_COUNTRY } = require('./constants');
 
 function validateInput(input) {
     if (!input) throw new Error('INPUT is missing.');
@@ -79,10 +79,11 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
             }
 
             if (geo) {
-                const geoObj = GEOLOCATIONS.filter(o => o.id === geo)[0];
-                if (geoObj) {
-                    url = url + `&geo=${geoObj.id}`;
-                }                
+                // const geoObj = GEOLOCATIONS.filter(o => o.id === geo)[0];
+                // if (geoObj) {
+                //     url = url + `&geo=${geoObj.id}`;
+                // }  
+                url = url + `&geo=${geo}`;              
             }
 
             sources.push({ url, userData: { label: 'START' } });

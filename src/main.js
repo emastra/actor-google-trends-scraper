@@ -24,6 +24,7 @@ Apify.main(async () => {
         category,
         maxItems = null,
         customTimeRange = null,
+        geo = null,
         extendOutputFunction = null,
         proxyConfiguration,
     } = input;
@@ -33,7 +34,7 @@ Apify.main(async () => {
     const userAgent = proxyUrl ? Apify.utils.getRandomUserAgent() : undefined;
 
     // initialize request list from url sources
-    const { sources, sheetTitle } = await checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, timeRange, category, customTimeRange);
+    const { sources, sheetTitle } = await checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, timeRange, category, customTimeRange, geo);
     const requestList = await Apify.openRequestList('start-list', sources);
 
     // open request queue

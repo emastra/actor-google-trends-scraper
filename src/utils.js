@@ -2,7 +2,7 @@ const Apify = require('apify');
 
 const { log } = Apify.utils;
 
-const { BASE_URL, PROXY_DEFAULT_COUNTRY } = require('./constants');
+const { BASE_URL, PROXY_DEFAULT_COUNTRY, GEOLOCATIONS } = require('./constants');
 
 function validateInput(input) {
     if (!input) throw new Error('INPUT is missing.');
@@ -60,7 +60,7 @@ function getProxyUrl(proxyConfiguration, addSession) {
     return proxyUrl;
 }
 
-async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, timeRange, category, customTimeRange) {
+async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, timeRange, category, customTimeRange, geo) {
     const sources = [];
     let output;
 
@@ -76,6 +76,13 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
 
             if (category) {
                 url = url + `&cat=${category}`;
+            }
+
+            if (geo) {
+                const geoObj = GEOLOCATIONS.filter(o => o.id === geo)[0];
+                if (geoObj) {
+                    url = url + `&geo=${geoObj.id}`;
+                }                
             }
 
             sources.push({ url, userData: { label: 'START' } });
@@ -104,12 +111,20 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
         for (const item of output) {
             const searchTerm = Object.values(item)[0];
             let url = BASE_URL + `?q=${encodeURIComponent(searchTerm)}`;
+
             if (timeRangeToUse) {
                 url = url + `&date=${encodeURIComponent(timeRangeToUse)}`;
             }
 
             if (category) {
                 url = url + `&cat=${category}`;
+            }
+
+            if (geo) {
+                const geoObj = GEOLOCATIONS.filter(o => o.id === geo)[0];
+                if (geoObj) {
+                    url = url + `&geo=${geoObj.id}`;
+                }                
             }
 
             sources.push({ url, userData: { label: 'START' } });

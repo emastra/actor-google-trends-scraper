@@ -68,7 +68,7 @@
         "geo": {
             "title": "Geo area",
             "type": "string",
-            "description": "Get results from a spefific geo area (defaults to 'Worldwide')",
+            "description": "Get results from a specific geo area (defaults to 'Worldwide')",
             "editor": "select",
             "default": "",
             "enumTitles": ["Worldwide", "Afghanistan","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antarctica","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria",

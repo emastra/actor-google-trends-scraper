@@ -18,7 +18,7 @@ Google Trends Scraper is an [Apify actor](https://apify.com/actors) for extracti
 | isPublic | boolean | If checked you can import a public spreadsheet without need for authorization. For importing private sheets, please read about authorization below. Defaults to `false`. |
 | timeRange | string | Choose a predefined search's time range (defaults to 'Past 12 months') |
 | category | string | Choose a category to filter the search for (defaults to 'All categories') |
-| geo | string | Get results from a spefific geo area (defaults to 'Worldwide') |
+| geo | string | Get results from a specific geo area (defaults to 'Worldwide') |
 | maxItems | number | (optional) Maximum number of product items to be scraped |
 | customTimeRange | string | Provide a custom time range. If provided, it takes precedence over regular timeRange. Read [Custom time range](#custom-time-range) for correct format and examples. |
 | extendOutputFunction | string | (optional) Function that takes a JQuery handle ($) as argument and returns data that will be merged with the default output. More information in [Extend output function](#extend-output-function) |

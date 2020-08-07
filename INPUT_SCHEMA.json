@@ -30,25 +30,25 @@
             "editor": "select",
             "default": "",
             "enumTitles": [
-                "Past 12 months (output frequency: 7 days)", 
-                "Past hour (output frequency: 1 minute)", 
-                "Past 4 hours (output frequency: 1 minute)", 
-                "Past day (output frequency: 8 minutes)", 
-                "Past 7 days (output frequency: 1 hour)", 
-                "Past 30 days (output frequency: 1 day)", 
-                "Past 90 days (output frequency: 1 day)", 
-                "Past 5 years (output frequency: 7 days)", 
+                "Past 12 months (output frequency: 7 days)",
+                "Past hour (output frequency: 1 minute)",
+                "Past 4 hours (output frequency: 1 minute)",
+                "Past day (output frequency: 8 minutes)",
+                "Past 7 days (output frequency: 1 hour)",
+                "Past 30 days (output frequency: 1 day)",
+                "Past 90 days (output frequency: 1 day)",
+                "Past 5 years (output frequency: 7 days)",
                 "2004 - present (output frequency: 1 month)"
             ],
             "enum": [
-                "", 
-                "now 1-H", 
-                "now 4-H", 
-                "now 1-d", 
-                "now 7-d", 
-                "today 1-m", 
-                "today 3-m", 
-                "today 5-y", 
+                "",
+                "now 1-H",
+                "now 4-H",
+                "now 1-d",
+                "now 7-d",
+                "today 1-m",
+                "today 3-m",
+                "today 5-y",
                 "all"
             ],
             "prefill": ""
@@ -59,10 +59,10 @@
             "description": "Choose a category to filter the search for (defaults to 'All categories')",
             "editor": "select",
             "default": "",
-            "enumTitles": ["All categories", "Arts & Entertainment", "Autos & Vehicles", "Beauty & Fitness", "Books & Literature", "Business & Industrial", "Computers & Electronics", 
+            "enumTitles": ["All categories", "Arts & Entertainment", "Autos & Vehicles", "Beauty & Fitness", "Books & Literature", "Business & Industrial", "Computers & Electronics",
                 "Finance", "Food & Drink", "Games", "Health", "Hobbies & Leisure", "Home & Garden", "Internet & Telecom", "Jobs & Education", "Law & Government", "News",
                 "Online Communities", "People & Society", "Pets & Animals", "Property", "Reference", "Science", "Shopping", "Sports", "Travel"],
-            "enum": ["", "3", "47", "44", "22", "12", "5", "7", "71", "8", "45", "65", "11", "13", "958", "19", 
+            "enum": ["", "3", "47", "44", "22", "12", "5", "7", "71", "8", "45", "65", "11", "13", "958", "19",
                 "16", "299", "14", "66", "29", "533", "174", "18", "20", "67"]
         },
         "geo": {
@@ -143,6 +143,12 @@
             "prefill": {
                 "useApifyProxy": true
             }
+        },
+        "outputAsISODate": {
+            "title": "Output as ISO Date",
+            "description": "Outputs date column as an ISO date time string",
+            "default": false,
+            "type": "boolean"
         }
     }
 }

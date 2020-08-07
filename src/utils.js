@@ -2,7 +2,7 @@ const Apify = require('apify');
 
 const { log } = Apify.utils;
 
-const { BASE_URL, PROXY_DEFAULT_COUNTRY } = require('./constants');
+const { BASE_URL } = require('./constants');
 
 function validateInput(input) {
     if (!input) throw new Error('INPUT is missing.');
@@ -41,49 +41,30 @@ function validateInput(input) {
     validate('proxyConfiguration', 'object');
 }
 
-function getProxyUrl(proxyConfiguration, addSession) {
-    let { useApifyProxy = true, proxyUrl, apifyProxyGroups } = proxyConfiguration;
-    // console.log(useApifyProxy, proxyUrl, apifyProxyGroups);
-
-    // if no custom proxy is provided, set proxyUrl
-    if (!proxyUrl) {
-        if (!useApifyProxy) return undefined;
-
-        proxyUrl = Apify.getApifyProxyUrl({
-            password: process.env.APIFY_PROXY_PASSWORD,
-            groups: apifyProxyGroups,
-            session: addSession ? Date.now().toString() : undefined,
-            country: PROXY_DEFAULT_COUNTRY
-        });
-    }
-
-    return proxyUrl;
-}
-
 async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, timeRange, category, customTimeRange, geo) {
     const sources = [];
     let output;
 
-    const timeRangeToUse = customTimeRange ? customTimeRange : timeRange;
+    const timeRangeToUse = customTimeRange || timeRange;
 
     if (searchTerms) {
         for (const searchTerm of searchTerms) {
-            let url = BASE_URL + `?q=${encodeURIComponent(searchTerm)}`;
+            let url = `${BASE_URL}?q=${encodeURIComponent(searchTerm)}`;
 
             if (timeRangeToUse) {
-                url = url + `&date=${encodeURIComponent(timeRangeToUse)}`;
+                url += `&date=${encodeURIComponent(timeRangeToUse)}`;
             }
 
             if (category) {
-                url = url + `&cat=${category}`;
+                url += `&cat=${category}`;
             }
 
             if (geo) {
                 // const geoObj = GEOLOCATIONS.filter(o => o.id === geo)[0];
                 // if (geoObj) {
                 //     url = url + `&geo=${geoObj.id}`;
-                // }  
-                url = url + `&geo=${geo}`;              
+                // }
+                url += `&geo=${geo}`;
             }
 
             sources.push({ url, userData: { label: 'START' } });
@@ -93,39 +74,36 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
     if (spreadsheetId) {
         log.info('Importing spreadsheet...');
         const run = await Apify.call('lukaskrivka/google-sheets', {
-          mode: "read",
-          spreadsheetId: spreadsheetId,
-          publicSpreadsheet: isPublic,
-          deduplicateByEquality: false,
-          createBackup: false,
-          // tokensStore: "google-oauth-tokens" // default
+            mode: 'read',
+            spreadsheetId,
+            publicSpreadsheet: isPublic,
+            deduplicateByEquality: false,
+            createBackup: false,
+            // tokensStore: "google-oauth-tokens" // default
         });
 
         output = run.output.body;
 
         // Validation of the output
-        const isBadFormat = output.some(item => Object.keys(item).length !== 1);
+        const isBadFormat = output.some((item) => Object.keys(item).length !== 1);
         if (isBadFormat) throw new Error('Spreadsheet must have only one column. Check the actor documentation for more info.');
 
         log.info('Spreadsheet successfully imported.');
 
         for (const item of output) {
             const searchTerm = Object.values(item)[0];
-            let url = BASE_URL + `?q=${encodeURIComponent(searchTerm)}`;
+            let url = `${BASE_URL}?q=${encodeURIComponent(searchTerm)}`;
 
             if (timeRangeToUse) {
-                url = url + `&date=${encodeURIComponent(timeRangeToUse)}`;
+                url += `&date=${encodeURIComponent(timeRangeToUse)}`;
             }
 
             if (category) {
-                url = url + `&cat=${category}`;
+                url += `&cat=${category}`;
             }
 
             if (geo) {
-                const geoObj = GEOLOCATIONS.filter(o => o.id === geo)[0];
-                if (geoObj) {
-                    url = url + `&geo=${geoObj.id}`;
-                }                
+                url += `&geo=${geo}`;
             }
 
             sources.push({ url, userData: { label: 'START' } });
@@ -147,6 +125,10 @@ function maxItemsCheck(maxItems, itemCount) {
 }
 
 function checkAndEval(extendOutputFunction) {
+    if (!extendOutputFunction) {
+        return;
+    }
+
     let evaledFunc;
 
     try {
@@ -158,18 +140,25 @@ function checkAndEval(extendOutputFunction) {
     if (typeof evaledFunc !== 'function') {
         throw new Error('extendOutputFunction is not a function! Please fix it or use just default output!');
     }
-
-    return evaledFunc;
 }
 
-async function applyFunction($, evaledFunc, items) {
-    const isObject = val => typeof val === 'object' && val !== null && !Array.isArray(val);
+/**
+ * No-op when no extendOutputFunction
+ */
+async function applyFunction(page, extendOutputFunction) {
+    if (!extendOutputFunction) {
+        return {};
+    }
+
+    const isObject = (val) => typeof val === 'object' && val !== null && !Array.isArray(val);
 
     let userResult = {};
     try {
-        userResult = await evaledFunc($);
+        userResult = await page.evaluate(async (eof) => {
+            return eval(eof)(window.jQuery);
+        }, extendOutputFunction);
     } catch (err) {
-        log.error(`extendOutputFunction crashed! Pushing default output. Please fix your function if you want to update the output. Error: ${err}`);
+        log.error(`extendOutputFunction crashed! Pushing default output. Please fix your function if you want to update the output.\n\t${err}`);
     }
 
     if (!isObject(userResult)) {
@@ -177,16 +166,11 @@ async function applyFunction($, evaledFunc, items) {
         process.exit(1);
     }
 
-    items.forEach((item, i) => {
-        items[i] = { ...item, ...userResult };
-    });
-
-    return items;
+    return userResult;
 }
 
 module.exports = {
     validateInput,
-    getProxyUrl,
     checkAndCreateUrlSource,
     maxItemsCheck,
     checkAndEval,

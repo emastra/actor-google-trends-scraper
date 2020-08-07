@@ -1,16 +1,15 @@
 const Apify = require('apify');
+
 const { log } = Apify.utils;
 const querystring = require('querystring');
 
 const {
     validateInput,
-    getProxyUrl,
     checkAndCreateUrlSource,
     maxItemsCheck,
     checkAndEval,
     applyFunction,
 } = require('./utils');
-
 
 Apify.main(async () => {
     const input = await Apify.getInput();
@@ -27,11 +26,8 @@ Apify.main(async () => {
         geo = null,
         extendOutputFunction = null,
         proxyConfiguration,
+        outputAsISODate = false,
     } = input;
-
-    // create proxy url(s) to be used in crawler configuration
-    const proxyUrl = getProxyUrl(proxyConfiguration, true);
-    const userAgent = proxyUrl ? Apify.utils.getRandomUserAgent() : undefined;
 
     // initialize request list from url sources
     const { sources, sheetTitle } = await checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, timeRange, category, customTimeRange, geo);
@@ -44,9 +40,12 @@ Apify.main(async () => {
     const dataset = await Apify.openDataset();
     let { itemCount } = await dataset.getInfo();
 
-    // if exists, evaluate extendOutputFunction
-    let evaledFunc;
-    if (extendOutputFunction) evaledFunc = checkAndEval(extendOutputFunction);
+    // if exists, evaluate extendOutputFunction, or throw
+    checkAndEval(extendOutputFunction);
+
+    const proxyConfig = await Apify.createProxyConfiguration({
+        ...proxyConfiguration,
+    });
 
     // crawler config
     const crawler = new Apify.PuppeteerCrawler({
@@ -55,25 +54,29 @@ Apify.main(async () => {
         maxRequestRetries: 3,
         handlePageTimeoutSecs: 240,
         maxConcurrency: 20,
+        useSessionPool: true,
+        proxyConfiguration: proxyConfig,
         launchPuppeteerOptions: {
-            proxyUrl: proxyUrl,
-            userAgent: userAgent,
             timeout: 120 * 1000,
-            headless: true
+            stealth: true,
+            useChrome: Apify.isAtHome(),
+            stealthOptions: {
+                hideWebDriver: true,
+            },
         },
 
         gotoFunction: async ({ request, page }) => {
-          return page.goto(request.url, {
-            timeout: 180 * 1000,
-            waitUntil: 'networkidle2'
-          });
+            return page.goto(request.url, {
+                timeout: 180 * 1000,
+                waitUntil: 'networkidle2',
+            });
         },
 
-        handlePageFunction: async ({ page, request, response }) => {
+        handlePageFunction: async ({ page, request }) => {
             // if exists, check items limit. If limit is reached crawler will exit.
             if (maxItems) maxItemsCheck(maxItems, itemCount);
 
-            log.info('Processing:', request.url);
+            log.info('Processing:', { url: request.url });
             const { label } = request.userData;
 
             //
@@ -89,11 +92,15 @@ Apify.main(async () => {
                 }
 
                 // Check if data is present for current search term
-                await page.waitForSelector('[widget-name=TIMESERIES]', { timeout: 60*1000 });
+                await page.waitForSelector('[widget-name=TIMESERIES]', { timeout: 60 * 1000 });
                 const hasNoData = await page.evaluate(() => {
                     const widget = document.querySelector('[widget-name=TIMESERIES]');
                     return !!widget.querySelector('p.widget-error-title');
                 });
+
+                if (extendOutputFunction) {
+                    await Apify.utils.puppeteer.injectJQuery(page);
+                }
 
                 // if no data, push message and return!
                 if (hasNoData) {
@@ -101,32 +108,33 @@ Apify.main(async () => {
                     resObject[sheetTitle] = searchTerm;
                     resObject.message = 'The search term displays no data.';
 
-                    await Apify.pushData(resObject);
+                    const result = await applyFunction(page, extendOutputFunction);
+
+                    await Apify.pushData({ ...resObject, ...result });
 
                     log.info(`The search term "${searchTerm}" displays no data.`);
                     return;
                 }
 
-                await page.waitForSelector('div[aria-label="A tabular representation of the data in the chart."]');
+                await page.waitForSelector('svg ~ div > table > tbody');
 
                 const results = await page.evaluate(() => {
-                    const dataDiv = document.querySelector('div[aria-label="A tabular representation of the data in the chart."]');
-                    const tbody = dataDiv.querySelector('tbody');
+                    const tbody = document.querySelector('svg ~ div > table > tbody');
                     const trs = Array.from(tbody.children);
 
                     // results is an array of arrays which contains in pos 0 the date, pos 1 the value
-                    const results = trs.map((tr) => {
+                    const r = trs.map((tr) => {
                         const result = [];
 
                         const tds = Array.from(tr.children);
                         tds.forEach((td) => {
-                            result.push(td.innerText);
+                            result.push(td.textContent.trim());
                         });
 
                         return result;
                     });
 
-                    return results;
+                    return r;
                 });
 
                 // Prepare object to be pushed
@@ -135,11 +143,21 @@ Apify.main(async () => {
 
                 for (const res of results) {
                     // res[0] holds the date, res[1] holds the value. The date will be the name of the column when dataset is exported to spreadsheet
-                    resObject[res[0]] = Number(res[1]);
+                    let buf = Buffer.from(res[0]);
+                    if (buf.readUInt8(0) === 0xe2) {
+                        // google adds some unicode garbage to the data, chop both ends
+                        buf = buf.slice(3).slice(0, -3);
+                    }
+
+                    const key = buf.toString();
+                    resObject[outputAsISODate ? new Date(key).toISOString() : key] = Number(res[1]);
                 }
 
+                const result = await applyFunction(page, extendOutputFunction);
+
                 // push, increase itemCount, log
-                await Apify.pushData(resObject);
+                await Apify.pushData({ ...resObject, ...result });
+
                 itemCount++;
                 log.info(`Results for "${searchTerm}" pushed successfully.`);
             }

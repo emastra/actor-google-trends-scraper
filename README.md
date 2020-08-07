@@ -31,7 +31,7 @@ Google Trends Scraper is an [Apify actor](https://apify.com/actors) for extracti
 - [See google sheet example](https://github.com/emastra/actor-google-trends-scraper/blob/master/google-sheet-example.png)
 
 **Notes on timeRange**\
-On the Apify platform you can choose the time range from a select menu. 
+On the Apify platform you can choose the time range from a select menu.
 If you provide the INPUT as JSON, these are the `timeRange` possible values:<br />
 ```
 `now 1-H` (equals to Past hour)
@@ -54,7 +54,7 @@ If you provide the INPUT as JSON, these are the `timeRange` possible values:<br 
     "another test term"
   ],
   "spreadsheetId": spreadsheetId,
-  "timeRange": "now 4-H", 
+  "timeRange": "now 4-H",
   "isPublic": true,
   "maxItems": 100,
   "customTimeRange": "2020-03-24 2020-03-29",
@@ -71,14 +71,27 @@ Output is stored in a dataset.
 Each item will contain the search term and all values keyed by the corresponding date.
 
 Example of one output item:
-```
+
+```jsonc
 {
   "searchTerm": "CNN",
   "‪Jan 13, 2019‬": 92,
   "‪Jan 20, 2019‬": 100,
   "‪Jan 27, 2019‬": 86,
   "‪Feb 3, 2019‬": 82,
-  ...
+  //...
+}
+```
+
+If you set `outputAsISODate` to `true`, it will show as:
+
+```jsonc
+{
+  "Term / Date": "CNN",
+  "2019-08-11T03:00:00.000Z": 43,
+  "2019-08-18T03:00:00.000Z": 34,
+  "2019-08-25T03:00:00.000Z": 34,
+  // ...
 }
 ```
 
@@ -108,7 +121,7 @@ Examples:
 2019-03-20 2019-03-26
 ```
 
-Only when the range is up to 7 days, each date supports the time as well. 
+Only when the range is up to 7 days, each date supports the time as well.
 Examples:
 ```
 2020-03-24T08 2020-03-29T15
@@ -126,10 +139,26 @@ You can return fields to achieve 3 different things:
 - Remove a field - Return an existing field with a value `undefined`
 
 The following example will add a new field:
-```
+
+```js
 ($) => {
     return {
         comment: 'This is a comment',
+    }
+}
+```
+
+You can also get the related keyword and link trends by using this:
+
+```js
+($) => {
+    return {
+        trends: $('a[href^="/trends/explore"] .label-text')
+          .map((_, s) => ({
+              text: s.innerText,
+              link: s.closest('a').href
+          }))
+          .toArray()
     }
 }
 ```

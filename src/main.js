@@ -63,11 +63,14 @@ Apify.main(async () => {
         launchPuppeteerOptions: {
             stealth,
             useChrome,
+            stealthOptions: {
+                hideWebDriver: true,
+            },
         },
         gotoFunction: async ({ request, page }) => {
             return page.goto(request.url, {
                 timeout: pageLoadTimeoutSecs * 1000,
-                waitUntil: 'domcontentloaded', // 'networkidle2', TODO: We have to figure this out
+                waitUntil: 'networkidle2', // 'networkidle2', TODO: We have to figure this out
             });
         },
         handlePageFunction: async ({ page, request, session }) => {

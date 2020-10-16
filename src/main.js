@@ -70,7 +70,7 @@ Apify.main(async () => {
         gotoFunction: async ({ request, page }) => {
             return page.goto(request.url, {
                 timeout: pageLoadTimeoutSecs * 1000,
-                waitUntil: 'networkidle2', // 'networkidle2', TODO: We have to figure this out
+                waitUntil: 'domcontentloaded', // 'networkidle2', TODO: We have to figure this out
             });
         },
         handlePageFunction: async ({ page, request, session }) => {
@@ -87,8 +87,10 @@ Apify.main(async () => {
 
                 const is429 = await page.evaluate(() => !!document.querySelector('div#af-error-container'));
                 if (is429) {
+                    await Apify.utils.puppeteer.saveSnapshot(page, { key: 'ERROR-BLOCK', saveHtml: false });
                     session.retire();
-                    throw new Error('Page got a 429 Error. Google is rate limiting us, retrying with different IP...');
+                    // eslint-disable-next-line no-throw-literal
+                    throw 'Page got a 429 Error. Google is rate limiting us, retrying with different IP...';
                 }
 
                 // Check if data is present for current search term
@@ -116,7 +118,12 @@ Apify.main(async () => {
                     return;
                 }
 
-                await page.waitForSelector('svg ~ div > table > tbody', { timeout: 120 * 1000 });
+                try {
+                    await page.waitForSelector('svg ~ div > table > tbody', { timeout: 120 * 1000 });
+                } catch (e) {
+                    await Apify.utils.puppeteer.saveSnapshot(page, { key: 'ERROR-DATA-NOT-LOADED', saveHtml: false });
+                    throw e;
+                }
 
                 const results = await page.evaluate(() => {
                     const tbody = document.querySelector('svg ~ div > table > tbody');

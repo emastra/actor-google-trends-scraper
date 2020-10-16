@@ -102,7 +102,7 @@ Apify.main(async () => {
                 const is429 = await page.evaluate(() => !!document.querySelector('div#af-error-container'));
                 if (is429) {
                     // eslint-disable-next-line no-throw-literal
-                    throw 'Page got a 429 Error. Google is baiting is to throw out the proxy but we need to stick with it...';
+                    throw 'Page got a 429 Error. Google is baiting us to throw out the proxy but we need to stick with it...';
                 }
 
                 // Check if data is present for current search term

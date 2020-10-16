@@ -1,7 +1,8 @@
 const Apify = require('apify');
+const querystring = require('querystring');
+const UserAgent = require('user-agents');
 
 const { log } = Apify.utils;
-const querystring = require('querystring');
 
 const {
     validateInput,
@@ -67,10 +68,14 @@ Apify.main(async () => {
                 hideWebDriver: true,
             },
         },
-        gotoFunction: async ({ request, page }) => {
+        gotoFunction: async ({ request, page, session }) => {
+            if (!session.userData.userAgent) {
+                session.userData.userAgent = new UserAgent().toString();
+            }
+            await page.setUserAgent(session.userData.userAgent);
             return page.goto(request.url, {
                 timeout: pageLoadTimeoutSecs * 1000,
-                waitUntil: 'domcontentloaded', // 'networkidle2', TODO: We have to figure this out
+                waitUntil: 'networkidle2', // 'networkidle2', TODO: We have to figure this out
             });
         },
         handlePageFunction: async ({ page, request, session }) => {
@@ -87,8 +92,8 @@ Apify.main(async () => {
 
                 const is429 = await page.evaluate(() => !!document.querySelector('div#af-error-container'));
                 if (is429) {
-                    await Apify.utils.puppeteer.saveSnapshot(page, { key: 'ERROR-BLOCK', saveHtml: false });
-                    session.retire();
+                    // await Apify.utils.puppeteer.saveSnapshot(page, { key: 'ERROR-BLOCK', saveHtml: false });
+                    // session.retire();
                     // eslint-disable-next-line no-throw-literal
                     throw 'Page got a 429 Error. Google is rate limiting us, retrying with different IP...';
                 }

@@ -26,6 +26,10 @@ Apify.main(async () => {
         geo = null,
         extendOutputFunction = null,
         proxyConfiguration,
+        stealth = false,
+        useChrome = false,
+        pageLoadTimeoutSecs = 180,
+        maxConcurrency = 20,
         outputAsISODate = false,
     } = input;
 
@@ -51,35 +55,27 @@ Apify.main(async () => {
     const crawler = new Apify.PuppeteerCrawler({
         requestList,
         requestQueue,
-        maxRequestRetries: 3,
+        maxRequestRetries: 5,
         handlePageTimeoutSecs: 240,
-        maxConcurrency: 20,
+        maxConcurrency,
         useSessionPool: true,
         proxyConfiguration: proxyConfig,
         launchPuppeteerOptions: {
-            timeout: 120 * 1000,
-            stealth: true,
-            useChrome: Apify.isAtHome(),
-            stealthOptions: {
-                hideWebDriver: true,
-            },
+            stealth,
+            useChrome,
         },
-
         gotoFunction: async ({ request, page }) => {
             return page.goto(request.url, {
-                timeout: 180 * 1000,
-                waitUntil: 'networkidle2',
+                timeout: pageLoadTimeoutSecs * 1000,
+                waitUntil: 'domcontentloaded', // 'networkidle2', TODO: We have to figure this out
             });
         },
-
-        handlePageFunction: async ({ page, request }) => {
+        handlePageFunction: async ({ page, request, session }) => {
             // if exists, check items limit. If limit is reached crawler will exit.
             if (maxItems) maxItemsCheck(maxItems, itemCount);
 
             log.info('Processing:', { url: request.url });
             const { label } = request.userData;
-
-            //
 
             if (label === 'START') {
                 // const searchTerm = decodeURIComponent(request.url.split('?')[1].split('=')[1]);
@@ -88,11 +84,12 @@ Apify.main(async () => {
 
                 const is429 = await page.evaluate(() => !!document.querySelector('div#af-error-container'));
                 if (is429) {
-                    throw new Error('Page got a 429 Error');
+                    session.retire();
+                    throw new Error('Page got a 429 Error. Google is rate limiting us, retrying with different IP...');
                 }
 
                 // Check if data is present for current search term
-                await page.waitForSelector('[widget-name=TIMESERIES]', { timeout: 60 * 1000 });
+                await page.waitForSelector('[widget-name=TIMESERIES]', { timeout: 120 * 1000 });
                 const hasNoData = await page.evaluate(() => {
                     const widget = document.querySelector('[widget-name=TIMESERIES]');
                     return !!widget.querySelector('p.widget-error-title');
@@ -116,7 +113,7 @@ Apify.main(async () => {
                     return;
                 }
 
-                await page.waitForSelector('svg ~ div > table > tbody');
+                await page.waitForSelector('svg ~ div > table > tbody', { timeout: 120 * 1000 });
 
                 const results = await page.evaluate(() => {
                     const tbody = document.querySelector('svg ~ div > table > tbody');

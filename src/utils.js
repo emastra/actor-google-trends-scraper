@@ -113,6 +113,8 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
     // grab the name of the custom column title
     const sheetTitle = spreadsheetId ? Object.keys(output[0])[0] : 'Term / Date';
 
+    log.info(`Created ${sources.length} Start URLs`);
+
     return { sources, sheetTitle };
 }
 

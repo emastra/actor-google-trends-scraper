@@ -149,6 +149,35 @@
             "description": "Outputs date column as an ISO date time string",
             "default": false,
             "type": "boolean"
+        },
+        "stealth": {
+            "title": "Stealth (not recommended)",
+            "description": "Uses hiding techniques but currently doesn't work well. Keeping here for testing",
+            "default": false,
+            "type": "boolean",
+            "section": "Browser options"
+        },
+        "useChrome": {
+            "title": "Use Chrome (not recommended)",
+            "description": "Uses full Chrome browser but it might not work well depending on Puppeteer version. Keeping here for testing",
+            "default": false,
+            "type": "boolean"
+        },
+        "maxConcurrency": {
+            "title": "Max concurrency",
+            "type": "integer",
+            "minimum": 1,
+            "description": "How many pages will be opened in parallel if enough CPU is available.",
+            "default": 20,
+            "unit": "parallel pages"
+        },
+        "pageLoadTimeoutSecs": {
+            "title": "Page load timeout",
+            "type": "integer",
+            "minimum": 30,
+            "description": "How long it will wait for page loading before it abandons the loading and tries again.",
+            "default": 180,
+            "unit": "seconds"
         }
     }
 }

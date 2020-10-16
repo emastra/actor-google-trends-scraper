@@ -3,16 +3,13 @@
 	"version": "0.0.1",
 	"description": "Google trends scraper",
 	"dependencies": {
-		"apify": "^0.21.3"
-	},
-	"devDependencies": {
-		"@apify/eslint-config": "^0.1.0",
-		"eslint": "^7.6.0"
+		"apify": "^0.21.8"
 	},
 	"scripts": {
 		"start": "node src/main.js",
 		"test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1"
 	},
 	"author": "emastra",
-	"license": "Apache"
+	"license": "Apache",
+	"devDependencies": {}
 }

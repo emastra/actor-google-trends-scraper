@@ -133,7 +133,7 @@ Apify.main(async () => {
                 try {
                     await page.waitForSelector('svg ~ div > table > tbody', { timeout: 60 * 1000 });
                 } catch (e) {
-                    await Apify.utils.puppeteer.saveSnapshot(page, { key: 'ERROR-DATA-NOT-LOADED', saveHtml: false });
+                    await Apify.utils.puppeteer.saveSnapshot(page, { key: `ERROR-DATA-NOT-LOADED-${Math.random()}` });
                     throw e;
                 }
 

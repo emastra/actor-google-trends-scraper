@@ -117,7 +117,7 @@ Apify.main(async () => {
                     await page.waitForFunction(async () => {
                         const widget = document.querySelector('[widget-name=TIMESERIES]');
                         return !!widget.querySelector('p.widget-error-title');
-                    });
+                    }, { timeout: 120 * 1000 });
                     return false;
                 };
 

@@ -12,6 +12,15 @@ const {
     applyFunction,
 } = require('./utils');
 
+// READ THIS BEFORE YOU TOUCH THE CODE!!!
+
+// There is super weird anti-scraping system here
+// The first page always gives you 429 but you MUST NOT throw out the proxy
+// Only the second and consequent usage works
+
+// WE CANNOT UPGRADE TO SDK 0.21.4+ because it auto kills session on 429
+// or we have to remove SessionPool completely (it might be still useful though)
+
 Apify.main(async () => {
     const input = await Apify.getInput();
     validateInput(input);
@@ -75,10 +84,10 @@ Apify.main(async () => {
             await page.setUserAgent(session.userData.userAgent);
             return page.goto(request.url, {
                 timeout: pageLoadTimeoutSecs * 1000,
-                waitUntil: 'networkidle2', // 'networkidle2', TODO: We have to figure this out
+                waitUntil: 'domcontentloaded', // 'networkidle2', TODO: We have to figure this out
             });
         },
-        handlePageFunction: async ({ page, request, session }) => {
+        handlePageFunction: async ({ page, request }) => {
             // if exists, check items limit. If limit is reached crawler will exit.
             if (maxItems) maxItemsCheck(maxItems, itemCount);
 
@@ -92,10 +101,8 @@ Apify.main(async () => {
 
                 const is429 = await page.evaluate(() => !!document.querySelector('div#af-error-container'));
                 if (is429) {
-                    // await Apify.utils.puppeteer.saveSnapshot(page, { key: 'ERROR-BLOCK', saveHtml: false });
-                    // session.retire();
                     // eslint-disable-next-line no-throw-literal
-                    throw 'Page got a 429 Error. Google is rate limiting us, retrying with different IP...';
+                    throw 'Page got a 429 Error. Google is baiting is to throw out the proxy but we need to stick with it...';
                 }
 
                 // Check if data is present for current search term
@@ -124,7 +131,7 @@ Apify.main(async () => {
                 }
 
                 try {
-                    await page.waitForSelector('svg ~ div > table > tbody', { timeout: 120 * 1000 });
+                    await page.waitForSelector('svg ~ div > table > tbody', { timeout: 60 * 1000 });
                 } catch (e) {
                     await Apify.utils.puppeteer.saveSnapshot(page, { key: 'ERROR-DATA-NOT-LOADED', saveHtml: false });
                     throw e;

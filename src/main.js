@@ -95,6 +95,9 @@ Apify.main(async () => {
             const { label } = request.userData;
 
             if (label === 'START') {
+                if (extendOutputFunction) {
+                    await Apify.utils.puppeteer.injectJQuery(page);
+                }
                 // const searchTerm = decodeURIComponent(request.url.split('?')[1].split('=')[1]);
                 const queryStringObj = querystring.parse(request.url.split('?')[1]);
                 const searchTerm = queryStringObj.q;
@@ -105,19 +108,27 @@ Apify.main(async () => {
                     throw 'Page got a 429 Error. Google is baiting us to throw out the proxy but we need to stick with it...';
                 }
 
-                // Check if data is present for current search term
-                await page.waitForSelector('[widget-name=TIMESERIES]', { timeout: 120 * 1000 });
-                const hasNoData = await page.evaluate(() => {
-                    const widget = document.querySelector('[widget-name=TIMESERIES]');
-                    return !!widget.querySelector('p.widget-error-title');
-                });
+                // The data are loading as well as the empty results error
+                // So we race between them so we don't wait unecessarily
 
-                if (extendOutputFunction) {
-                    await Apify.utils.puppeteer.injectJQuery(page);
-                }
+                // Returns false value if the empty selector is found
+                const waitForEmptyDataSelector = async () => {
+                    await page.waitForSelector('[widget-name=TIMESERIES]', { timeout: 120 * 1000 });
+                    await page.waitForFunction(async () => {
+                        const widget = document.querySelector('[widget-name=TIMESERIES]');
+                        return !!widget.querySelector('p.widget-error-title');
+                    });
+                    return false;
+                };
+
+                // Returns truhly value if the data selector is found
+                const waitForDataSelector = page.waitForSelector('svg ~ div > table > tbody', { timeout: 115 * 1000 });
+
+                // Evaluates either to boolean (false if empty data) or a truthly selector
+                const hasData = await Promise.race([waitForDataSelector, waitForEmptyDataSelector()]);
 
                 // if no data, push message and return!
-                if (hasNoData) {
+                if (!hasData) {
                     const resObject = Object.create(null);
                     resObject[sheetTitle] = searchTerm;
                     resObject.message = 'The search term displays no data.';
@@ -127,14 +138,11 @@ Apify.main(async () => {
                     await Apify.pushData({ ...resObject, ...result });
 
                     log.info(`The search term "${searchTerm}" displays no data.`);
+                    await Apify.utils.puppeteer.saveSnapshot(page, {
+                        key: `NO-DATA-${searchTerm.replace(/[^a-zA-Z0-9-_]/g, '-')}`,
+                        saveHtml: false,
+                    });
                     return;
-                }
-
-                try {
-                    await page.waitForSelector('svg ~ div > table > tbody', { timeout: 60 * 1000 });
-                } catch (e) {
-                    await Apify.utils.puppeteer.saveSnapshot(page, { key: `ERROR-DATA-NOT-LOADED-${Math.random()}` });
-                    throw e;
                 }
 
                 const results = await page.evaluate(() => {

@@ -155,7 +155,7 @@
             "description": "Uses hiding techniques but currently doesn't work well. Keeping here for testing",
             "default": false,
             "type": "boolean",
-            "section": "Browser options"
+            "sectionCaption": "Browser options"
         },
         "useChrome": {
             "title": "Use Chrome (not recommended)",

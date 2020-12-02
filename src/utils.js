@@ -171,8 +171,38 @@ async function applyFunction(page, extendOutputFunction) {
     return userResult;
 }
 
+/**
+ * The actor provides a way to use custom time ranges, so we need to
+ * brute force the returned dates. It assumes UTC, might be wrong with
+ * other geo parameters
+ *
+ * @param {string} key
+ */
+function parseKeyAsIsoDate(key) {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentDay = now.getDay();
+    const currentMonth = now.getMonth();
+
+    try {
+        // toISOString() throws with 'Invalid time value'. Valid dates with year, Nov 3, 2020
+        return new Date(key).toISOString();
+    } catch (e) {
+        try {
+            // Nov 13 at 11:00PM -> Nov 13, 2020, 11:00PM
+            return new Date(key).toISOString().replace(' at ', `, ${currentYear}, `).toISOString();
+        } catch (e) {
+            // 11:00PM
+            const dummyDate = new Date(`${currentDay}/${currentMonth + 1}, ${currentYear}, ${key}`);
+            now.setHours(dummyDate.getHours(), dummyDate.getMinutes(), 0, 0);
+            return now.toISOString();
+        }
+    }
+}
+
 module.exports = {
     validateInput,
+    parseKeyAsIsoDate,
     checkAndCreateUrlSource,
     maxItemsCheck,
     checkAndEval,

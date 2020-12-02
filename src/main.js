@@ -10,6 +10,7 @@ const {
     maxItemsCheck,
     checkAndEval,
     applyFunction,
+    parseKeyAsIsoDate,
 } = require('./utils');
 
 // READ THIS BEFORE YOU TOUCH THE CODE!!!
@@ -18,8 +19,8 @@ const {
 // The first page always gives you 429 but you MUST NOT throw out the proxy
 // Only the second and consequent usage works
 
-// WE CANNOT UPGRADE TO SDK 0.21.4+ because it auto kills session on 429
-// or we have to remove SessionPool completely (it might be still useful though)
+// TODO: remove this hack
+require('apify/build/constants').STATUS_CODES_BLOCKED = [401, 403];
 
 Apify.main(async () => {
     const input = await Apify.getInput();
@@ -177,7 +178,8 @@ Apify.main(async () => {
                     }
 
                     const key = buf.toString();
-                    resObject[outputAsISODate ? new Date(key).toISOString() : key] = Number(res[1]);
+                    // same day keys are missing the year
+                    resObject[outputAsISODate ? parseKeyAsIsoDate(key) : key] = Number(res[1]);
                 }
 
                 const result = await applyFunction(page, extendOutputFunction);

@@ -26,6 +26,7 @@ RUN npm --quiet set progress=false \
  && echo "NPM version:" \
  && npm --version
 
+ENV npm_config_loglevel=silent
 # Next, copy the remaining files and directories with the source code.
 # Since we do this after NPM install, quick build will be really fast
 # for simple source file changes.

@@ -184,13 +184,20 @@ function parseKeyAsIsoDate(key) {
     const currentDay = now.getDay();
     const currentMonth = now.getMonth();
 
+    key = key.replace(/\s(AM|PM)/gi, ' $1');
+
     try {
         // toISOString() throws with 'Invalid time value'. Valid dates with year, Nov 3, 2020
-        return new Date(key).toISOString();
+        const newDate = new Date(key);
+        if (newDate.getFullYear() < currentYear - 5) {
+            // means date is falling back to 2001
+            return new Date(`${key}, ${currentYear}`).toISOString();
+        }
+        return newDate.toISOString();
     } catch (e) {
         try {
-            // Nov 13 at 11:00PM -> Nov 13, 2020, 11:00PM
-            return new Date(key).toISOString().replace(' at ', `, ${currentYear}, `).toISOString();
+            // Nov 13 at 11:00 PM -> Nov 13, 2020, 11:00 PM
+            return new Date(key.replace(' at ', `, ${currentYear}, `)).toISOString();
         } catch (e) {
             // 11:00PM
             const dummyDate = new Date(`${currentDay}/${currentMonth + 1}, ${currentYear}, ${key}`);

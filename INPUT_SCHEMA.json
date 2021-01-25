@@ -179,5 +179,8 @@
             "default": 180,
             "unit": "seconds"
         }
-    }
+    },
+    "required": [
+        "proxyConfiguration"
+    ]
 }

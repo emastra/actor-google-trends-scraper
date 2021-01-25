@@ -4,14 +4,15 @@
 	"description": "Google trends scraper",
 	"dependencies": {
 		"@types/user-agents": "^1.0.0",
-		"apify": "^0.21.9",
-		"user-agents": "^1.0.559"
+		"puppeteer": "^5.5.0",
+		"apify": "^0.22.4",
+		"user-agents": "^1"
 	},
 	"scripts": {
 		"start": "node src/main.js",
 		"test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1"
 	},
 	"author": "emastra",
-	"license": "Apache",
+	"license": "Apache-2.0",
 	"devDependencies": {}
 }

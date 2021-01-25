@@ -11,13 +11,8 @@ const {
     checkAndEval,
     applyFunction,
     parseKeyAsIsoDate,
+    proxyConfiguration,
 } = require('./utils');
-
-// READ THIS BEFORE YOU TOUCH THE CODE!!!
-
-// There is super weird anti-scraping system here
-// The first page always gives you 429 but you MUST NOT throw out the proxy
-// Only the second and consequent usage works
 
 // TODO: remove this hack
 require('apify/build/constants').STATUS_CODES_BLOCKED = [401, 403];
@@ -36,7 +31,6 @@ Apify.main(async () => {
         customTimeRange = null,
         geo = null,
         extendOutputFunction = null,
-        proxyConfiguration,
         stealth = false,
         useChrome = false,
         pageLoadTimeoutSecs = 180,
@@ -44,12 +38,29 @@ Apify.main(async () => {
         outputAsISODate = false,
     } = input;
 
-    // initialize request list from url sources
-    const { sources, sheetTitle } = await checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, timeRange, category, customTimeRange, geo);
-    const requestList = await Apify.openRequestList('start-list', sources);
+    const proxyConfig = await proxyConfiguration({
+        proxyConfig: input.proxyConfiguration,
+    });
 
+    // initialize request list from url sources
+    const { sources, sheetTitle } = await checkAndCreateUrlSource(
+        searchTerms,
+        spreadsheetId,
+        isPublic,
+        timeRange,
+        category,
+        customTimeRange,
+        geo,
+    );
     // open request queue
     const requestQueue = await Apify.openRequestQueue();
+
+    await requestQueue.addRequest({
+        url: 'https://trends.google.com/trends', // hot start it
+        userData: {
+            label: 'START',
+        },
+    });
 
     // open dataset and get itemCount
     const dataset = await Apify.openDataset();
@@ -58,13 +69,8 @@ Apify.main(async () => {
     // if exists, evaluate extendOutputFunction, or throw
     checkAndEval(extendOutputFunction);
 
-    const proxyConfig = await Apify.createProxyConfiguration({
-        ...proxyConfiguration,
-    });
-
     // crawler config
     const crawler = new Apify.PuppeteerCrawler({
-        requestList,
         requestQueue,
         maxRequestRetries: 5,
         handlePageTimeoutSecs: 240,
@@ -78,6 +84,7 @@ Apify.main(async () => {
                 hideWebDriver: true,
             },
         },
+        persistCookiesPerSession: true,
         gotoFunction: async ({ request, page, session }) => {
             if (!session.userData.userAgent) {
                 session.userData.userAgent = new UserAgent().toString();
@@ -96,6 +103,10 @@ Apify.main(async () => {
             const { label } = request.userData;
 
             if (label === 'START') {
+                for (const source of sources) {
+                    await requestQueue.addRequest(source);
+                }
+            } else if (label === 'SEARCH') {
                 if (extendOutputFunction) {
                     await Apify.utils.puppeteer.injectJQuery(page);
                 }
@@ -105,6 +116,7 @@ Apify.main(async () => {
 
                 const is429 = await page.evaluate(() => !!document.querySelector('div#af-error-container'));
                 if (is429) {
+                    await Apify.utils.sleep(10000);
                     // eslint-disable-next-line no-throw-literal
                     throw 'Page got a 429 Error. Google is baiting us to throw out the proxy but we need to stick with it...';
                 }

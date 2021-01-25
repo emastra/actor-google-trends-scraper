@@ -41,7 +41,36 @@ function validateInput(input) {
     validate('proxyConfiguration', 'object');
 }
 
+/**
+ * @param {{
+ *   geo: string,
+ *   category: string,
+ *   searchTerm: string,
+ *   timeRangeToUse: string,
+ * }} params
+ */
+function newUrl({ geo, timeRangeToUse, category, searchTerm }) {
+    const nUrl = new URL(BASE_URL);
+
+    if (geo) {
+        nUrl.searchParams.set('geo', geo);
+    }
+
+    if (timeRangeToUse) {
+        nUrl.searchParams.set('date', timeRangeToUse);
+    }
+
+    if (category) {
+        nUrl.searchParams.set('cat', category);
+    }
+
+    nUrl.searchParams.set('q', decodeURIComponent(searchTerm)); // accepts %2F and /
+
+    return nUrl.toString();
+}
+
 async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, timeRange, category, customTimeRange, geo) {
+    /** @type {Apify.RequestOptions[]} */
     const sources = [];
     let output;
 
@@ -49,25 +78,15 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
 
     if (searchTerms) {
         for (const searchTerm of searchTerms) {
-            let url = `${BASE_URL}?q=${encodeURIComponent(searchTerm)}`;
-
-            if (timeRangeToUse) {
-                url += `&date=${encodeURIComponent(timeRangeToUse)}`;
-            }
-
-            if (category) {
-                url += `&cat=${category}`;
-            }
-
-            if (geo) {
-                // const geoObj = GEOLOCATIONS.filter(o => o.id === geo)[0];
-                // if (geoObj) {
-                //     url = url + `&geo=${geoObj.id}`;
-                // }
-                url += `&geo=${geo}`;
-            }
-
-            sources.push({ url, userData: { label: 'START' } });
+            sources.push({
+                url: newUrl({
+                    geo,
+                    category,
+                    timeRangeToUse,
+                    searchTerm,
+                }),
+                userData: { label: 'SEARCH' }
+            });
         }
     }
 
@@ -92,21 +111,16 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
 
         for (const item of output) {
             const searchTerm = Object.values(item)[0];
-            let url = `${BASE_URL}?q=${encodeURIComponent(searchTerm)}`;
 
-            if (timeRangeToUse) {
-                url += `&date=${encodeURIComponent(timeRangeToUse)}`;
-            }
-
-            if (category) {
-                url += `&cat=${category}`;
-            }
-
-            if (geo) {
-                url += `&geo=${geo}`;
-            }
-
-            sources.push({ url, userData: { label: 'START' } });
+            sources.push({
+                url: newUrl({
+                    geo,
+                    category,
+                    timeRangeToUse,
+                    searchTerm,
+                }),
+                userData: { label: 'SEARCH' }
+            });
         }
     }
 
@@ -207,10 +221,59 @@ function parseKeyAsIsoDate(key) {
     }
 }
 
+
+/**
+ * Do a generic check when using Apify Proxy
+ *
+ * @typedef params
+ * @property {any} [params.proxyConfig] Provided apify proxy configuration
+ * @property {boolean} [params.required] Make the proxy usage required when running on the platform
+ * @property {string[]} [params.blacklist] Blacklist of proxy groups, by default it's ['GOOGLE_SERP']
+ * @property {boolean} [params.force] By default, it only do the checks on the platform. Force checking regardless where it's running
+ * @property {string[]} [params.hint] Hint specific proxy groups that should be used, like SHADER or RESIDENTIAL
+ *
+ * @param {params} params
+ * @returns {Promise<Apify.ProxyConfiguration | undefined>}
+ */
+const proxyConfiguration = async ({
+    proxyConfig,
+    required = true,
+    force = Apify.isAtHome(),
+    blacklist = ['GOOGLE_SERP'],
+    hint = []
+}) => {
+    const configuration = await Apify.createProxyConfiguration(proxyConfig);
+
+    // this works for custom proxyUrls
+    if (Apify.isAtHome() && required) {
+        if (!configuration || (!configuration.usesApifyProxy && (!configuration.proxyUrls || !configuration.proxyUrls.length)) || !configuration.newUrl()) {
+            throw new Error(`\n=======\nYou're required to provide a valid proxy configuration\n\n=======`);
+        }
+    }
+
+    // check when running on the platform by default
+    if (force) {
+        // only when actually using Apify proxy it needs to be checked for the groups
+        if (configuration && configuration.usesApifyProxy) {
+            if (blacklist.some((blacklisted) => (configuration.groups || []).includes(blacklisted))) {
+                throw new Error(`\n=======\nUsing any of those proxy groups won't work:\n\n*  ${blacklist.join('\n*  ')}\n\n=======`);
+            }
+
+            // specific non-automatic proxy groups like RESIDENTIAL, not an error, just a hint
+            if (hint.length && !hint.some((group) => (configuration.groups || []).includes(group))) {
+                Apify.utils.log.info(`\n=======\nYou can pick specific proxy groups for better experience:\n\n*  ${hint.join('\n*  ')}\n\n=======`);
+            }
+        }
+    }
+
+    return configuration;
+}
+
 module.exports = {
     validateInput,
     parseKeyAsIsoDate,
     checkAndCreateUrlSource,
+    proxyConfiguration,
     maxItemsCheck,
     checkAndEval,
     applyFunction,

@@ -256,7 +256,7 @@ const proxyConfiguration = async ({
         // only when actually using Apify proxy it needs to be checked for the groups
         if (configuration && configuration.usesApifyProxy) {
             if (blacklist.some((blacklisted) => (configuration.groups || []).includes(blacklisted))) {
-                throw new Error(`\n=======\nUsing any of those proxy groups won't work:\n\n*  ${blacklist.join('\n*  ')}\n\n=======`);
+                throw new Error(`\n=======\nThese proxy groups cannot be used in this actor. Choose other group or contact support@apify.com to give you proxy trial:\n\n*  ${blacklist.join('\n*  ')}\n\n=======`);
             }
 
             // specific non-automatic proxy groups like RESIDENTIAL, not an error, just a hint

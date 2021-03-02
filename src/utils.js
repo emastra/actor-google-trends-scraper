@@ -101,7 +101,7 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
             // tokensStore: "google-oauth-tokens" // default
         });
 
-        output = run.output.body;
+        output = run.output.value;
 
         // Validation of the output
         const isBadFormat = output.some((item) => Object.keys(item).length !== 1);

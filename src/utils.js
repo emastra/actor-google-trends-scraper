@@ -92,14 +92,18 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
 
     if (spreadsheetId) {
         log.info('Importing spreadsheet...');
-        const run = await Apify.call('lukaskrivka/google-sheets', {
-            mode: 'read',
-            spreadsheetId,
-            publicSpreadsheet: isPublic,
-            deduplicateByEquality: false,
-            createBackup: false,
-            // tokensStore: "google-oauth-tokens" // default
-        });
+        const run = await Apify.call(
+            'lukaskrivka/google-sheets',
+            {
+                mode: 'read',
+                spreadsheetId,
+                publicSpreadsheet: isPublic,
+                deduplicateByEquality: false,
+                createBackup: false,
+                // tokensStore: "google-oauth-tokens" // default
+            },
+            { memoryMbytes: 512 },
+        );
 
         output = run.output.value;
 

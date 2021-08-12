@@ -8,7 +8,7 @@
             "type": "array",
             "editor": "stringList",
             "description": "(Required if 'spreadsheetId' is not provided) List of search terms to be scraped.",
-            "example": [ "CNN", "BBC", "Al Jazeera" ]
+            "prefill": [ "webscraping" ]
         },
         "spreadsheetId": {
             "title": "Spreadsheet id",

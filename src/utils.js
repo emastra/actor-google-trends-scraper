@@ -72,6 +72,7 @@ function newUrl({ geo, timeRangeToUse, category, searchTerm }) {
 async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, timeRange, category, customTimeRange, geo) {
     /** @type {Apify.RequestOptions[]} */
     const sources = [];
+    /** @type {any[]} */
     let output;
 
     const timeRangeToUse = customTimeRange || timeRange;
@@ -105,7 +106,7 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
             { memoryMbytes: 512 },
         );
 
-        output = run.output.value;
+        output = run.output.body;
 
         // Validation of the output
         const isBadFormat = output.some((item) => Object.keys(item).length !== 1);

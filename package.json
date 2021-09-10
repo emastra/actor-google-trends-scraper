@@ -1,18 +1,20 @@
 {
-	"name": "actor-google-trends-scraper",
-	"version": "0.0.1",
-	"description": "Google trends scraper",
-	"dependencies": {
-		"@types/user-agents": "^1.0.0",
-		"puppeteer": "^5.5.0",
-		"apify": "^0.22.4",
-		"user-agents": "^1"
-	},
-	"scripts": {
-		"start": "node src/main.js",
-		"test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1"
-	},
-	"author": "emastra",
-	"license": "Apache-2.0",
-	"devDependencies": {}
+    "name": "actor-google-trends-scraper",
+    "version": "0.0.1",
+    "description": "Google trends scraper",
+    "dependencies": {
+        "puppeteer": "*",
+        "apify": "^2.0.7"
+    },
+    "scripts": {
+        "start": "node src/main.js",
+        "test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1"
+    },
+    "author": "emastra",
+    "license": "Apache-2.0",
+    "devDependencies": {
+        "@apify/eslint-config": "^0.1.4",
+        "@types/lodash": "^4.14.172",
+        "eslint": "^7.32.0"
+    }
 }

@@ -1,6 +1,5 @@
 const Apify = require('apify');
 const querystring = require('querystring');
-const UserAgent = require('user-agents');
 
 const { log } = Apify.utils;
 
@@ -14,10 +13,8 @@ const {
     proxyConfiguration,
 } = require('./utils');
 
-// TODO: remove this hack
-require('apify/build/constants').STATUS_CODES_BLOCKED = [401, 403];
-
 Apify.main(async () => {
+    /** @type {any} */
     const input = await Apify.getInput();
     validateInput(input);
 
@@ -32,7 +29,6 @@ Apify.main(async () => {
         geo = null,
         extendOutputFunction = null,
         stealth = false,
-        useChrome = false,
         pageLoadTimeoutSecs = 180,
         maxConcurrency = 20,
         outputAsISODate = false,
@@ -76,28 +72,46 @@ Apify.main(async () => {
         handlePageTimeoutSecs: 240,
         maxConcurrency,
         useSessionPool: true,
+        sessionPoolOptions: {
+            maxPoolSize: 1,
+            sessionOptions: {
+                maxErrorScore: 5,
+            },
+        },
         proxyConfiguration: proxyConfig,
-        launchPuppeteerOptions: {
+        launchContext: {
             stealth,
-            useChrome,
+            useChrome: true,
+            launchOptions: {
+                headless: false,
+            },
             stealthOptions: {
                 hideWebDriver: true,
             },
         },
         persistCookiesPerSession: true,
-        gotoFunction: async ({ request, page, session }) => {
-            if (!session.userData.userAgent) {
-                session.userData.userAgent = new UserAgent().toString();
+        preNavigationHooks: [async (context, gotoOptions) => {
+            gotoOptions.timeout = pageLoadTimeoutSecs * 1000;
+            gotoOptions.waitUntil = 'domcontentloaded';
+        }],
+        postNavigationHooks: [async ({ browserController, response }) => {
+            if (response.status() === 429) {
+                await browserController.close();
+                throw new Error('Got 429 status, reopening');
             }
-            await page.setUserAgent(session.userData.userAgent);
-            return page.goto(request.url, {
-                timeout: pageLoadTimeoutSecs * 1000,
-                waitUntil: 'domcontentloaded', // 'networkidle2', TODO: We have to figure this out
-            });
-        },
+        }],
         handlePageFunction: async ({ page, request }) => {
             // if exists, check items limit. If limit is reached crawler will exit.
-            if (maxItems) maxItemsCheck(maxItems, itemCount);
+            if (maxItems && maxItemsCheck(maxItems, itemCount)) {
+                return;
+            }
+
+            const is429 = await page.evaluate(() => !!document.querySelector('div#af-error-container'));
+            if (is429) {
+                await Apify.utils.sleep(10000);
+                // eslint-disable-next-line no-throw-literal
+                throw 'Page got a 429 Error. Google is baiting us to throw out the proxy but we need to stick with it...';
+            }
 
             log.info('Processing:', { url: request.url });
             const { label } = request.userData;
@@ -113,13 +127,6 @@ Apify.main(async () => {
                 // const searchTerm = decodeURIComponent(request.url.split('?')[1].split('=')[1]);
                 const queryStringObj = querystring.parse(request.url.split('?')[1]);
                 const searchTerm = queryStringObj.q;
-
-                const is429 = await page.evaluate(() => !!document.querySelector('div#af-error-container'));
-                if (is429) {
-                    await Apify.utils.sleep(10000);
-                    // eslint-disable-next-line no-throw-literal
-                    throw 'Page got a 429 Error. Google is baiting us to throw out the proxy but we need to stick with it...';
-                }
 
                 // The data are loading as well as the empty results error
                 // So we race between them so we don't wait unecessarily

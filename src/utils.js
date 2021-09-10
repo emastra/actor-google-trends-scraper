@@ -85,7 +85,7 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
                     timeRangeToUse,
                     searchTerm,
                 }),
-                userData: { label: 'SEARCH' }
+                userData: { label: 'SEARCH' },
             });
         }
     }
@@ -123,7 +123,7 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
                     timeRangeToUse,
                     searchTerm,
                 }),
-                userData: { label: 'SEARCH' }
+                userData: { label: 'SEARCH' },
             });
         }
     }
@@ -139,9 +139,9 @@ async function checkAndCreateUrlSource(searchTerms, spreadsheetId, isPublic, tim
 function maxItemsCheck(maxItems, itemCount) {
     if (itemCount >= maxItems) {
         log.info('Actor reached the max items limit. Crawler is going to halt...');
-        log.info('Crawler Finished.');
-        process.exit();
+        return true;
     }
+    return false;
 }
 
 function checkAndEval(extendOutputFunction) {
@@ -182,8 +182,7 @@ async function applyFunction(page, extendOutputFunction) {
     }
 
     if (!isObject(userResult)) {
-        log.exception(new Error('extendOutputFunction must return an object!'));
-        process.exit(1);
+        throw new Error('extendOutputFunction must return an object!');
     }
 
     return userResult;
@@ -225,7 +224,6 @@ function parseKeyAsIsoDate(key) {
     }
 }
 
-
 /**
  * Do a generic check when using Apify Proxy
  *
@@ -244,7 +242,7 @@ const proxyConfiguration = async ({
     required = true,
     force = Apify.isAtHome(),
     blacklist = ['GOOGLESERP'],
-    hint = []
+    hint = [],
 }) => {
     const configuration = await Apify.createProxyConfiguration(proxyConfig);
 
@@ -271,7 +269,7 @@ const proxyConfiguration = async ({
     }
 
     return configuration;
-}
+};
 
 module.exports = {
     validateInput,

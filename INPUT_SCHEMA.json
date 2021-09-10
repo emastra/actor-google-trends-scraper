@@ -157,12 +157,6 @@
             "type": "boolean",
             "sectionCaption": "Browser options"
         },
-        "useChrome": {
-            "title": "Use Chrome (not recommended)",
-            "description": "Uses full Chrome browser but it might not work well depending on Puppeteer version. Keeping here for testing",
-            "default": false,
-            "type": "boolean"
-        },
         "maxConcurrency": {
             "title": "Max concurrency",
             "type": "integer",

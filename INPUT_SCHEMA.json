@@ -162,7 +162,7 @@
             "type": "integer",
             "minimum": 1,
             "description": "How many pages will be opened in parallel if enough CPU is available.",
-            "default": 20,
+            "default": 10,
             "unit": "parallel pages"
         },
         "pageLoadTimeoutSecs": {
@@ -172,6 +172,20 @@
             "description": "How long it will wait for page loading before it abandons the loading and tries again.",
             "default": 180,
             "unit": "seconds"
+        },
+        "useChrome": {
+            "title": "Use Chrome",
+            "description": "Use Google Chrome instead of Chromium",
+            "default": false,
+            "type": "boolean",
+            "editor": "checkbox"
+        },
+        "headless": {
+            "title": "Headless",
+            "description": "Use in headless mode",
+            "default": true,
+            "type": "boolean",
+            "editor": "checkbox"
         }
     },
     "required": [

@@ -13,6 +13,9 @@ const {
     proxyConfiguration,
 } = require('./utils');
 
+// Do not remove this patch
+require('apify/build/constants').STATUS_CODES_BLOCKED = [401, 403];
+
 Apify.main(async () => {
     /** @type {any} */
     const input = await Apify.getInput();
@@ -30,8 +33,10 @@ Apify.main(async () => {
         extendOutputFunction = null,
         stealth = false,
         pageLoadTimeoutSecs = 180,
-        maxConcurrency = 20,
+        maxConcurrency = 10,
         outputAsISODate = false,
+        useChrome = false,
+        headless = Apify.isAtHome(),
     } = input;
 
     const proxyConfig = await proxyConfiguration({
@@ -73,7 +78,7 @@ Apify.main(async () => {
         maxConcurrency,
         useSessionPool: true,
         sessionPoolOptions: {
-            maxPoolSize: 1,
+            maxPoolSize: sources.length || 10,
             sessionOptions: {
                 maxErrorScore: 5,
             },
@@ -81,24 +86,24 @@ Apify.main(async () => {
         proxyConfiguration: proxyConfig,
         launchContext: {
             stealth,
-            useChrome: true,
+            useChrome,
             launchOptions: {
-                headless: false,
+                headless,
             },
             stealthOptions: {
                 hideWebDriver: true,
             },
+        },
+        browserPoolOptions: {
+            maxOpenPagesPerBrowser: 1,
         },
         persistCookiesPerSession: true,
         preNavigationHooks: [async (context, gotoOptions) => {
             gotoOptions.timeout = pageLoadTimeoutSecs * 1000;
             gotoOptions.waitUntil = 'domcontentloaded';
         }],
-        postNavigationHooks: [async ({ browserController, response }) => {
-            if (response.status() === 429) {
-                await browserController.close();
-                throw new Error('Got 429 status, reopening');
-            }
+        postNavigationHooks: [async ({ page }) => {
+            await page.bringToFront();
         }],
         handlePageFunction: async ({ page, request }) => {
             // if exists, check items limit. If limit is reached crawler will exit.

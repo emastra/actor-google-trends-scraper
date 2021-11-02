@@ -1,38 +1,40 @@
-## Google Trends Scraper
+## Features
+[Google Trends](https://trends.google.com/trends) does not have an API, but Google Trends Scraper creates an unofficial Google Trends API to let you extract data from Google Trends directly and at scale. It is built on the powerful [Apify SDK](https://sdk.apify.com/) and you can run it on the [Apify platform](https://my.apify.com) and locally.
 
-Google Trends Scraper is an [Apify actor](https://apify.com/actors) for extracting data from [Google Trends](https://trends.google.com/trends) web site. Currently it scrapes only *Interest over time* data. It is build on top of [Apify SDK](https://sdk.apify.com/) and you can run it both on [Apify platform](https://my.apify.com) and locally.
+## Why scrape Google Trends?
+Google Trends lets you find out what people have been searching for around the globe, as well as what ideas and fashions are just emerging. By analyzing this at scale, you can learn what to invest in, and where to spend your resources most effectively.
 
-- [Input](#input)
-- [Output](#output)
-- [Authorization](#authorization)
-- [Custom time range](#custom-time-range)
-- [Extend output function](#extend-output-function)
-- [Open an issue](#open-an-issue)
+Whether you’re a journalist researching hot topics, a real estate developer keeping an eye on future property values, an SEO expert tracking keywords, or an e-commerce retailer thriving on the edge with dropshipping, Google Trends has useful data for you.
 
-### Input
+## Cost of usage
+Google Trends Scraper works best if you feed it more keywords for each scrape. In our experience, if you give it 1,000 keywords all at once, it will cost you approximately USD 0.80. If you give it only one keyword at a time, it will cost approx. USD 2.00-8.00.
 
+## Tutorials
+Check out our [step-by-step guide to scraping Google Trends](https://blog.apify.com/step-by-step-guide-to-scraping-google-trends/). It includes use cases, screenshots, and examples.
+
+## Input
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| searchTerms | array | (Required if 'spreadsheetId' is not provided) List of search terms to be scraped. |
+| searchTerms | array | This is the list of search terms to be scraped (required if 'spreadsheetId' is not provided). |
 | spreadsheetId | string | (Optional) Id of the google sheet from where search terms will be loaded. |
-| isPublic | boolean | If checked you can import a public spreadsheet without need for authorization. For importing private sheets, please read about authorization below. Defaults to `false`. |
-| timeRange | string | Choose a predefined search's time range (defaults to 'Past 12 months') |
-| category | string | Choose a category to filter the search for (defaults to 'All categories') |
+| isPublic | boolean | If checked, you can import a public spreadsheet without the need for authorization. To import private sheets, please read about authorization below. Defaults to `false`. |
+| timeRange | string | Choose a time range (defaults to 'Past 12 months') |
+| category | string | Choose a category to filter the search (defaults to 'All categories') |
 | geo | string | Get results from a specific geo area (defaults to 'Worldwide') |
 | maxItems | number | (optional) Maximum number of product items to be scraped |
 | customTimeRange | string | Provide a custom time range. If provided, it takes precedence over regular timeRange. Read [Custom time range](#custom-time-range) for correct format and examples. |
 | extendOutputFunction | string | (optional) Function that takes a JQuery handle ($) as argument and returns data that will be merged with the default output. More information in [Extend output function](#extend-output-function) |
-| proxyConfiguration | object | (optional) Proxy settings of the run. If you have access to Apify proxy, leave the default settings. If not, you can set `{ "useApifyProxy": false" }` to disable proxy usage |
+| proxyConfiguration | object | (Optional) Proxy settings. If you have access to Apify Proxy, leave the default settings. If not, you can set `{ "useApifyProxy": false" }` to disable proxy usage. |
 
-**Notes on the input as a spreadsheet**
-- The only spreadsheet allowed is a Google sheet.
+**Notes on input as spreadsheet**
+- The only spreadsheet allowed is a Google Sheet.
 - Spreadsheet must have only one column.
 - The first row of the spreadsheet is considered the title of the column so it will not be loaded as a search term.
-- [See google sheet example](https://github.com/emastra/actor-google-trends-scraper/blob/master/google-sheet-example.png)
+- [See Google Sheet example](https://github.com/emastra/actor-google-trends-scraper/blob/master/google-sheet-example.png)
 
 **Notes on timeRange**\
-On the Apify platform you can choose the time range from a select menu.
-If you provide the INPUT as JSON, these are the `timeRange` possible values:<br />
+On the Apify platform you can choose the time range with a dropdown menu.
+If you provide the input as JSON, these are the `timeRange` possible values:<br />
 ```
 `now 1-H` (equals to Past hour)
 `now 4-H` (equals to Past 4 hours)
@@ -67,7 +69,7 @@ If you provide the INPUT as JSON, these are the `timeRange` possible values:<br 
 
 ### Output
 
-Output is stored in a dataset.
+The scraper's output is stored in a dataset.
 Each item will contain the search term and all values keyed by the corresponding date.
 
 Example of one output item:
@@ -97,8 +99,9 @@ If you set `outputAsISODate` to `true`, it will show as:
 
 ### Authorization
 
-Authorization is needed only if your Google sheet is private.
-Google Trends Scraper internally runs [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization). The authorization process needs to be done running this actor separately in your account. After running it one time, the actor will save a token in your KV store and Google Trends Scraper will use it automatically. This means that after running [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization) one time, you can fully automate the Google Trends Scraper actor without thinking about authorization anymore.
+Authorization is needed only if your Google Sheet is private. 
+
+Google Trends Scraper internally runs [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization). The authorization process needs to be carried out by running this actor separately in your account. After running it once, the actor will save a token in your KV store and Google Trends Scraper will use it automatically. This means that after running [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization) just once, you can fully automate  Google Trends Scraper  without setting authorization parameters every time.
 
 Please check this [article](https://help.apify.com/en/articles/2424053-google-integration) for instructions on how to authorize using [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization).
 
@@ -128,7 +131,6 @@ Examples:
 ```
 
 ### Extend output function
-
 You can use this function to update the default output of this actor. This function gets a JQuery handle `$` as an argument so you can choose what data from the page you want to scrape. The output from this will function will get merged with the default output.
 
 The **return value** of this function has to be an **object**!
@@ -163,5 +165,5 @@ You can also get the related keyword and link trends by using this:
 }
 ```
 
-### Open an issue
-If you find any bug, please create an issue on the actor [Github page](https://github.com/emastra/actor-google-trends-scraper).
+### Report issues
+If you find any bugs, please create an issue on the [GitHub page](https://github.com/emastra/actor-google-trends-scraper).

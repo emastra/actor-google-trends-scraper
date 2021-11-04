@@ -27,35 +27,37 @@ Check out our [step-by-step guide to scraping Google Trends](https://blog.apify.
 | proxyConfiguration | object | (Optional) Proxy settings. If you have access to Apify Proxy, leave the default settings. If not, you can set `{ "useApifyProxy": false" }` to disable proxy usage. |
 
 **Notes on input as spreadsheet**
+
 - The only spreadsheet allowed is a Google Sheet.
 - Spreadsheet must have only one column.
 - The first row of the spreadsheet is considered the title of the column so it will not be loaded as a search term.
 - [See Google Sheet example](https://github.com/emastra/actor-google-trends-scraper/blob/master/google-sheet-example.png)
 
-**Notes on timeRange**\
+**Notes on timeRange**
+
 On the Apify platform you can choose the time range with a dropdown menu.
 If you provide the input as JSON, these are the `timeRange` possible values:<br />
-```
-`now 1-H` (equals to Past hour)
-`now 4-H` (equals to Past 4 hours)
-`now 1-d` (equals to Past day)
-`now 7-d` (equals to Past 7 days)
-`today 1-m` (equals to Past 30 days)
-`today 3-m` (equals to Past 90 days)
-`''` (empty string equals to Past 12 months. It's the default)
-`today 5-y` (equals to Past 5 years)
-`all` (equals to 2004-present)
-```
+
+* `now 1-H` (equals to Past hour)
+* `now 4-H` (equals to Past 4 hours)
+* `now 1-d` (equals to Past day)
+* `now 7-d` (equals to Past 7 days)
+* `today 1-m` (equals to Past 30 days)
+* `today 3-m` (equals to Past 90 days)
+* `''` (empty string equals to Past 12 months. It's the default)
+* `today 5-y` (equals to Past 5 years)
+* `all` (equals to 2004-present)
+
 
 **INPUT Example:**
 
-```
+```jsonc
 {
   "searchTerms": [
     "test term",
     "another test term"
   ],
-  "spreadsheetId": spreadsheetId,
+  "spreadsheetId": //spreadsheetId,
   "timeRange": "now 4-H",
   "isPublic": true,
   "maxItems": 100,
@@ -77,10 +79,10 @@ Example of one output item:
 ```jsonc
 {
   "searchTerm": "CNN",
-  "‪Jan 13, 2019‬": 92,
-  "‪Jan 20, 2019‬": 100,
-  "‪Jan 27, 2019‬": 86,
-  "‪Feb 3, 2019‬": 82,
+  "‪Jan 13, 2019‬": "92",
+  "‪Jan 20, 2019‬": "100",
+  "‪Jan 27, 2019‬": "86",
+  "‪Feb 3, 2019‬": "82",
   //...
 }
 ```
@@ -90,16 +92,16 @@ If you set `outputAsISODate` to `true`, it will show as:
 ```jsonc
 {
   "Term / Date": "CNN",
-  "2019-08-11T03:00:00.000Z": 43,
-  "2019-08-18T03:00:00.000Z": 34,
-  "2019-08-25T03:00:00.000Z": 34,
+  "2019-08-11T03:00:00.000Z": "43",
+  "2019-08-18T03:00:00.000Z": "34",
+  "2019-08-25T03:00:00.000Z": "34",
   // ...
 }
 ```
 
 ### Authorization
 
-Authorization is needed only if your Google Sheet is private. 
+Authorization is needed only if your Google Sheet is private.
 
 Google Trends Scraper internally runs [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization). The authorization process needs to be carried out by running this actor separately in your account. After running it once, the actor will save a token in your KV store and Google Trends Scraper will use it automatically. This means that after running [Google Sheets Import & Export actor](https://apify.com/lukaskrivka/google-sheets#authentication-and-authorization) just once, you can fully automate  Google Trends Scraper  without setting authorization parameters every time.
 
@@ -111,26 +113,33 @@ You may download the output as a nicely formatted spreadsheet from the *dataset*
 
 ### Custom time range
 
-Custom time range is a string with the following order:\
-`startDate endDate`\
-And the following format:\
+Custom time range is a string with the following order:
+
+`startDate endDate`
+
+And the following format:
+
 `YYYY-MM-DD YYYY-MM-DD`
 
 Examples:
+
 ```
 2020-01-30 2020-03-29
 ```
+
 ```
 2019-03-20 2019-03-26
 ```
 
 Only when the range is up to 7 days, each date supports the time as well.
 Examples:
+
 ```
 2020-03-24T08 2020-03-29T15
 ```
 
 ### Extend output function
+
 You can use this function to update the default output of this actor. This function gets a JQuery handle `$` as an argument so you can choose what data from the page you want to scrape. The output from this will function will get merged with the default output.
 
 The **return value** of this function has to be an **object**!
@@ -166,4 +175,5 @@ You can also get the related keyword and link trends by using this:
 ```
 
 ### Report issues
+
 If you find any bugs, please create an issue on the [GitHub page](https://github.com/emastra/actor-google-trends-scraper).

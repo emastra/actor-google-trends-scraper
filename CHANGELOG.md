@@ -1,3 +1,14 @@
+## 2021-11-03
+
+Features:
+- SDK version to 2.1.0
+- Support comparing 2+ items
+
+Fix:
+- Comparision terms
+- Don't output average value
+- Session and concurrency for a lot of URLs (thousands)
+
 ## 2021-09-20
 
 Features:

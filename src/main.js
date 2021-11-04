@@ -1,5 +1,4 @@
 const Apify = require('apify');
-const querystring = require('querystring');
 
 const { log } = Apify.utils;
 
@@ -31,12 +30,9 @@ Apify.main(async () => {
         customTimeRange = null,
         geo = null,
         extendOutputFunction = null,
-        stealth = false,
         pageLoadTimeoutSecs = 180,
         maxConcurrency = 10,
         outputAsISODate = false,
-        useChrome = false,
-        headless = Apify.isAtHome(),
     } = input;
 
     const proxyConfig = await proxyConfiguration({
@@ -73,27 +69,18 @@ Apify.main(async () => {
     // crawler config
     const crawler = new Apify.PuppeteerCrawler({
         requestQueue,
-        maxRequestRetries: 5,
-        handlePageTimeoutSecs: 240,
+        maxRequestRetries: 3,
+        // needs some time to enqueue all the initial requests
+        handlePageTimeoutSecs: 300,
         maxConcurrency,
         useSessionPool: true,
         sessionPoolOptions: {
-            maxPoolSize: sources.length || 10,
+            maxPoolSize: maxConcurrency,
             sessionOptions: {
                 maxErrorScore: 5,
             },
         },
         proxyConfiguration: proxyConfig,
-        launchContext: {
-            stealth,
-            useChrome,
-            launchOptions: {
-                headless,
-            },
-            stealthOptions: {
-                hideWebDriver: true,
-            },
-        },
         browserPoolOptions: {
             maxOpenPagesPerBrowser: 1,
         },
@@ -130,8 +117,9 @@ Apify.main(async () => {
                     await Apify.utils.puppeteer.injectJQuery(page);
                 }
                 // const searchTerm = decodeURIComponent(request.url.split('?')[1].split('=')[1]);
-                const queryStringObj = querystring.parse(request.url.split('?')[1]);
-                const searchTerm = queryStringObj.q;
+                const queryStringObj = new URL(request.url);
+                const searchTerm = queryStringObj.searchParams.get('q');
+                const terms = [...(searchTerm?.split(','))];
 
                 // The data are loading as well as the empty results error
                 // So we race between them so we don't wait unecessarily
@@ -141,16 +129,19 @@ Apify.main(async () => {
                     await page.waitForSelector('[widget-name=TIMESERIES]', { timeout: 30000 });
                     await page.waitForFunction(async () => {
                         const widget = document.querySelector('[widget-name=TIMESERIES]');
-                        return !!widget.querySelector('p.widget-error-title');
+                        return !!widget?.querySelector('p.widget-error-title');
                     }, { timeout: 120 * 1000 });
                     return false;
                 };
 
                 // Returns truhly value if the data selector is found
-                const waitForDataSelector = page.waitForSelector('svg ~ div > table > tbody', { timeout: 30000 });
+                const waitForDataSelector = page.waitForSelector('svg ~ div > table > tbody tr', { timeout: 30000 });
 
                 // Evaluates either to boolean (false if empty data) or a truthly selector
-                const hasData = await Promise.race([waitForDataSelector, waitForEmptyDataSelector()]);
+                const hasData = await Promise.race([
+                    waitForDataSelector,
+                    waitForEmptyDataSelector(),
+                ]);
 
                 // if no data, push message and return!
                 if (!hasData) {
@@ -170,23 +161,30 @@ Apify.main(async () => {
                     return;
                 }
 
+                /**
+                 * @type {Array<[string, string[]]>}
+                 */
                 const results = await page.evaluate(() => {
-                    const tbody = document.querySelector('svg ~ div > table > tbody');
-                    const trs = Array.from(tbody.children);
+                    const trs = [...document.querySelectorAll('svg ~ div > table > tbody tr')].filter((el) => !el.closest('.hiddenDiv,bar-chart'));
 
                     // results is an array of arrays which contains in pos 0 the date, pos 1 the value
-                    const r = trs.map((tr) => {
+                    return trs.map((tr) => {
                         const result = [];
 
                         const tds = Array.from(tr.children);
-                        tds.forEach((td) => {
-                            result.push(td.textContent.trim());
+                        /** @type {string[]} */
+                        const values = [];
+
+                        result.push(tds[0].textContent.trim());
+
+                        tds.slice(1).forEach((td) => {
+                            values.push(td.textContent.trim());
                         });
+
+                        result.push(values);
 
                         return result;
                     });
-
-                    return r;
                 });
 
                 // Prepare object to be pushed
@@ -203,7 +201,7 @@ Apify.main(async () => {
 
                     const key = buf.toString();
                     // same day keys are missing the year
-                    resObject[outputAsISODate ? parseKeyAsIsoDate(key) : key] = Number(res[1]);
+                    resObject[outputAsISODate ? parseKeyAsIsoDate(key) : key] = terms.map((_, index) => Number(res[1][index])).join(',');
                 }
 
                 const result = await applyFunction(page, extendOutputFunction);

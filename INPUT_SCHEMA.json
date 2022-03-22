@@ -1,173 +1,173 @@
 {
-    "title": "Google Trends input schema",
-    "type": "object",
-    "schemaVersion": 1,
-    "properties": {
-        "searchTerms": {
-            "title": "Search terms",
-            "type": "array",
-            "editor": "stringList",
-            "description": "(Required if 'spreadsheetId' is not provided) List of search terms to be scraped.",
-            "prefill": [ "webscraping" ]
-        },
-        "spreadsheetId": {
-            "title": "Spreadsheet id",
-            "type": "string",
-            "description": "(Optional) Id of the google sheet from where search terms will be loaded.\n Spreadsheet must have only one column. Row 1 is considered the title of the column so it will not be loaded as a search term. Check the actor documentation for more info.",
-            "editor": "textfield"
-        },
-        "isPublic": {
-            "title": "Is public",
-            "type": "boolean",
-            "editor": "checkbox",
-            "description": "If checked you can import a public spreadsheet without need for authorization. For importing private sheets, please read about authorization in the actor documentation.",
-            "default": false
-        },
-        "timeRange": {
-            "title": "Time range",
-            "type": "string",
-            "description": "Choose a predefined search's time range (defaults to 'Past 12 months')",
-            "editor": "select",
-            "default": "",
-            "enumTitles": [
-                "Past 12 months (output frequency: 7 days)",
-                "Past hour (output frequency: 1 minute)",
-                "Past 4 hours (output frequency: 1 minute)",
-                "Past day (output frequency: 8 minutes)",
-                "Past 7 days (output frequency: 1 hour)",
-                "Past 30 days (output frequency: 1 day)",
-                "Past 90 days (output frequency: 1 day)",
-                "Past 5 years (output frequency: 7 days)",
-                "2004 - present (output frequency: 1 month)"
-            ],
-            "enum": [
-                "",
-                "now 1-H",
-                "now 4-H",
-                "now 1-d",
-                "now 7-d",
-                "today 1-m",
-                "today 3-m",
-                "today 5-y",
-                "all"
-            ],
-            "prefill": ""
-        },
-        "category": {
-            "title": "Category",
-            "type": "string",
-            "description": "Choose a category to filter the search for (defaults to 'All categories')",
-            "editor": "select",
-            "default": "",
-            "enumTitles": ["All categories", "Arts & Entertainment", "Autos & Vehicles", "Beauty & Fitness", "Books & Literature", "Business & Industrial", "Computers & Electronics",
-                "Finance", "Food & Drink", "Games", "Health", "Hobbies & Leisure", "Home & Garden", "Internet & Telecom", "Jobs & Education", "Law & Government", "News",
-                "Online Communities", "People & Society", "Pets & Animals", "Property", "Reference", "Science", "Shopping", "Sports", "Travel"],
-            "enum": ["", "3", "47", "44", "22", "12", "5", "7", "71", "8", "45", "65", "11", "13", "958", "19",
-                "16", "299", "14", "66", "29", "533", "174", "18", "20", "67"]
-        },
-        "geo": {
-            "title": "Geo area",
-            "type": "string",
-            "description": "Get results from a specific geo area (defaults to 'Worldwide')",
-            "editor": "select",
-            "default": "",
-            "enumTitles": ["Worldwide", "Afghanistan","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antarctica","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria",
-                "Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia, Plurinational State of",
-                "Bonaire, Sint Eustatius and Saba","Bosnia and Herzegovina","Botswana","Bouvet Island","Brazil","British Indian Ocean Territory",
-                "Brunei Darussalam","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Cayman Islands",
-                "Central African Republic","Chad","Chile","China","Christmas Island","Cocos","Colombia","Comoros","Congo","Congo, the Democratic Republic of the",
-                "Cook Islands","Costa Rica","Cote d'Ivoire !Côte d'Ivoire","Croatia","Cuba","Curaçao","Cyprus","Czechia","Denmark",
-                "Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia",
-                "Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Guiana","French Polynesia",
-                "French Southern Territories","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada",
-                "Guadeloupe","Guam","Guatemala","Guernsey","Guinea","Guinea-Bissau","Guyana","Haiti","Heard Island and McDonald Islands",
-                "Holy See","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran, Islamic Republic of","Iraq","Ireland",
-                "Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Korea","Korea",
-                "Kuwait","Kyrgyzstan","Lao People's Democratic Republic","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein",
-                "Lithuania","Luxembourg","Macao","Macedonia, the former Yugoslav Republic of","Madagascar","Malawi","Malaysia","Maldives",
-                "Mali","Malta","Marshall Islands","Martinique","Mauritania","Mauritius","Mayotte","Mexico","Micronesia, Federated States of",
-                "Moldova, Republic of","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauru",
-                "Nepal","Netherlands[note 1]","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","Niue","Norfolk Island",
-                "Northern Mariana Islands","Norway","Oman","Pakistan","Palau","Palestine, State of","Panama","Papua New Guinea","Paraguay",
-                "Peru","Philippines","Pitcairn","Poland","Portugal","Puerto Rico","Qatar","Reunion !Réunion","Romania","Russian Federation",
-                "Rwanda","Saint Barthélemy","Saint Helena, Ascension and Tristan da Cunha","Saint Kitts and Nevis","Saint Lucia",
-                "Saint Martin","Saint Pierre and Miquelon","Saint Vincent and the Grenadines","Samoa","San Marino","Sao Tome and Principe",
-                "Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Sint Maarten","Slovakia","Slovenia",
-                "Solomon Islands","Somalia","South Africa","South Georgia and the South Sandwich Islands","South Sudan","Spain","Sri Lanka",
-                "Sudan","Suriname","Svalbard and Jan Mayen","Swaziland","Sweden","Switzerland","Syrian Arab Republic","Taiwan, Province of China [note 2]",
-                "Tajikistan","Tanzania, United Republic of","Thailand","Timor-Leste","Togo","Tokelau","Tonga","Trinidad and Tobago",
-                "Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","Tuvalu","Uganda","Ukraine","United Arab Emirates",
-                "United Kingdom","United States","United States Minor Outlying Islands","Uruguay","Uzbekistan","Vanuatu","Venezuela, Bolivarian Republic of",
-                "Viet Nam","Virgin Islands, British","Virgin Islands, U.S.","Wallis and Futuna","Western Sahara","Yemen","Zambia","Zimbabwe"
-            ],
-            "enum": ["", "AF","AL","DZ","AS","AD","AO","AI","AQ","AG","AR","AM","AW","AU","AT","AZ","BS","BH","BD","BB","BY","BE",
-                "BZ","BJ","BM","BT","BO","BQ","BA","BW","BV","BR","IO","BN","BG","BF","BI","CV","KH","CM","CA","KY","CF","TD",
-                "CL","CN","CX","Keeling Islands ","CO","KM","CG","CD","CK","CR","CI","HR","CU","CW","CY","CZ","DK","DJ","DM",
-                "DO","EC","EG","SV","GQ","ER","EE","ET","Malvinas ","FO","FJ","FI","FR","GF","PF","TF","GA","GM","GE","DE",
-                "GH","GI","GR","GL","GD","GP","GU","GT","GG","GN","GW","GY","HT","HM","Vatican City State ","HN","HK","HU",
-                "IS","IN","ID","IR","IQ","IE","IM","IL","IT","JM","JP","JE","JO","KZ","KE","KI","the Democratic People's Republic of ",
-                "the Republic of ","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","LU","MO","MK","MG","MW","MY","MV","ML","MT",
-                "MH","MQ","MR","MU","YT","MX","FM","MD","MC","MN","ME","MS","MA","MZ","MM","NA","NR","NP","NL","NC","NZ","NI","NE","NG",
-                "NU","NF","MP","NO","OM","PK","PW","PS","PA","PG","PY","PE","PH","PN","PL","PT","PR","QA","RE","RO","RU","RW","BL","SH",
-                "KN","LC","French part ","PM","VC","WS","SM","ST","SA","SN","RS","SC","SL","SG","Dutch part ","SK","SI","SB","SO","ZA",
-                "GS","SS","ES","LK","SD","SR","SJ","SZ","SE","CH","SY","TW","TJ","TZ","TH","TL","TG","TK","TO","TT","TN","TR","TM","TC",
-                "TV","UG","UA","AE","GB","US","UM","UY","UZ","VU","VE","VN","VG","VI","WF","EH","YE","ZM","ZW"
-            ]
-        },
-        "maxItems": {
-            "title": "Max items",
-            "type": "integer",
-            "minimum": 0,
-            "description": "Limit of product items to be scraped. Zero value means no limit.",
-            "default": 0
-        },
-        "customTimeRange": {
-            "title": "Custom time range",
-            "type": "string",
-            "description": "Provide custom time range. If present, it takes precedence over regular timeRange. Format is: `YYYY-MM-DD YYYY-MM-DD`. See examples in the documentation.",
-            "editor": "textfield",
-            "sectionCaption": "Advanced options"
-        },
-        "extendOutputFunction": {
-            "title": "Extend output function",
-            "type": "string",
-            "editor": "javascript",
-            "description": "A function which result will get merged with the default result. It must return an object.",
-            "example": "($) => {\n    const result = {};\n    // Uncomment to add an extra field to each item of the output\n    // result.extraField = 'Test field';\n\n    return result;\n}"
-        },
-        "proxyConfiguration": {
-            "title": "Proxy configuration",
-            "type": "object",
-            "editor": "proxy",
-            "description": "The best option is usually Automatic proxy, but you can also use your own proxies or no proxy. It defaults to useApifyProxy. Country defaults to 'US'.",
-            "prefill": {
-                "useApifyProxy": true
-            }
-        },
-        "outputAsISODate": {
-            "title": "Output as ISO Date",
-            "description": "Outputs date column as an ISO date time string",
-            "default": false,
-            "type": "boolean"
-        },
-        "maxConcurrency": {
-            "title": "Max concurrency",
-            "type": "integer",
-            "minimum": 1,
-            "description": "How many pages will be opened in parallel if enough CPU is available.",
-            "default": 10,
-            "unit": "parallel pages"
-        },
-        "pageLoadTimeoutSecs": {
-            "title": "Page load timeout",
-            "type": "integer",
-            "minimum": 30,
-            "description": "How long it will wait for page loading before it abandons the loading and tries again.",
-            "default": 180,
-            "unit": "seconds"
-        }
-    },
-    "required": [
-        "proxyConfiguration"
-    ]
+  "title": "Google Trends input schema",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+      "searchTerms": {
+          "title": "Search terms",
+          "type": "array",
+          "editor": "stringList",
+          "description": "(Required if 'spreadsheetId' is not provided) List of search terms to be scraped.",
+          "prefill": [ "webscraping" ]
+      },
+      "timeRange": {
+          "title": "Time range",
+          "type": "string",
+          "description": "Choose a predefined search's time range (defaults to 'Past 12 months')",
+          "editor": "select",
+          "default": "",
+          "enumTitles": [
+              "Past 12 months (output frequency: 7 days)",
+              "Past hour (output frequency: 1 minute)",
+              "Past 4 hours (output frequency: 1 minute)",
+              "Past day (output frequency: 8 minutes)",
+              "Past 7 days (output frequency: 1 hour)",
+              "Past 30 days (output frequency: 1 day)",
+              "Past 90 days (output frequency: 1 day)",
+              "Past 5 years (output frequency: 7 days)",
+              "2004 - present (output frequency: 1 month)"
+          ],
+          "enum": [
+              "",
+              "now 1-H",
+              "now 4-H",
+              "now 1-d",
+              "now 7-d",
+              "today 1-m",
+              "today 3-m",
+              "today 5-y",
+              "all"
+          ],
+          "prefill": ""
+      },
+      "geo": {
+          "title": "Geo area",
+          "type": "string",
+          "description": "Get results from a specific geo area (defaults to 'Worldwide')",
+          "editor": "select",
+          "default": "",
+          "enumTitles": ["Worldwide", "Afghanistan","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antarctica","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria",
+              "Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia, Plurinational State of",
+              "Bonaire, Sint Eustatius and Saba","Bosnia and Herzegovina","Botswana","Bouvet Island","Brazil","British Indian Ocean Territory",
+              "Brunei Darussalam","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Cayman Islands",
+              "Central African Republic","Chad","Chile","China","Christmas Island","Cocos","Colombia","Comoros","Congo","Congo, the Democratic Republic of the",
+              "Cook Islands","Costa Rica","Cote d'Ivoire !Côte d'Ivoire","Croatia","Cuba","Curaçao","Cyprus","Czechia","Denmark",
+              "Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia",
+              "Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Guiana","French Polynesia",
+              "French Southern Territories","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada",
+              "Guadeloupe","Guam","Guatemala","Guernsey","Guinea","Guinea-Bissau","Guyana","Haiti","Heard Island and McDonald Islands",
+              "Holy See","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran, Islamic Republic of","Iraq","Ireland",
+              "Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Korea","Korea",
+              "Kuwait","Kyrgyzstan","Lao People's Democratic Republic","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein",
+              "Lithuania","Luxembourg","Macao","Macedonia, the former Yugoslav Republic of","Madagascar","Malawi","Malaysia","Maldives",
+              "Mali","Malta","Marshall Islands","Martinique","Mauritania","Mauritius","Mayotte","Mexico","Micronesia, Federated States of",
+              "Moldova, Republic of","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauru",
+              "Nepal","Netherlands[note 1]","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","Niue","Norfolk Island",
+              "Northern Mariana Islands","Norway","Oman","Pakistan","Palau","Palestine, State of","Panama","Papua New Guinea","Paraguay",
+              "Peru","Philippines","Pitcairn","Poland","Portugal","Puerto Rico","Qatar","Reunion !Réunion","Romania","Russian Federation",
+              "Rwanda","Saint Barthélemy","Saint Helena, Ascension and Tristan da Cunha","Saint Kitts and Nevis","Saint Lucia",
+              "Saint Martin","Saint Pierre and Miquelon","Saint Vincent and the Grenadines","Samoa","San Marino","Sao Tome and Principe",
+              "Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Sint Maarten","Slovakia","Slovenia",
+              "Solomon Islands","Somalia","South Africa","South Georgia and the South Sandwich Islands","South Sudan","Spain","Sri Lanka",
+              "Sudan","Suriname","Svalbard and Jan Mayen","Swaziland","Sweden","Switzerland","Syrian Arab Republic","Taiwan, Province of China [note 2]",
+              "Tajikistan","Tanzania, United Republic of","Thailand","Timor-Leste","Togo","Tokelau","Tonga","Trinidad and Tobago",
+              "Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","Tuvalu","Uganda","Ukraine","United Arab Emirates",
+              "United Kingdom","United States","United States Minor Outlying Islands","Uruguay","Uzbekistan","Vanuatu","Venezuela, Bolivarian Republic of",
+              "Viet Nam","Virgin Islands, British","Virgin Islands, U.S.","Wallis and Futuna","Western Sahara","Yemen","Zambia","Zimbabwe"
+          ],
+          "enum": ["", "AF","AL","DZ","AS","AD","AO","AI","AQ","AG","AR","AM","AW","AU","AT","AZ","BS","BH","BD","BB","BY","BE",
+              "BZ","BJ","BM","BT","BO","BQ","BA","BW","BV","BR","IO","BN","BG","BF","BI","CV","KH","CM","CA","KY","CF","TD",
+              "CL","CN","CX","Keeling Islands ","CO","KM","CG","CD","CK","CR","CI","HR","CU","CW","CY","CZ","DK","DJ","DM",
+              "DO","EC","EG","SV","GQ","ER","EE","ET","Malvinas ","FO","FJ","FI","FR","GF","PF","TF","GA","GM","GE","DE",
+              "GH","GI","GR","GL","GD","GP","GU","GT","GG","GN","GW","GY","HT","HM","Vatican City State ","HN","HK","HU",
+              "IS","IN","ID","IR","IQ","IE","IM","IL","IT","JM","JP","JE","JO","KZ","KE","KI","the Democratic People's Republic of ",
+              "the Republic of ","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","LU","MO","MK","MG","MW","MY","MV","ML","MT",
+              "MH","MQ","MR","MU","YT","MX","FM","MD","MC","MN","ME","MS","MA","MZ","MM","NA","NR","NP","NL","NC","NZ","NI","NE","NG",
+              "NU","NF","MP","NO","OM","PK","PW","PS","PA","PG","PY","PE","PH","PN","PL","PT","PR","QA","RE","RO","RU","RW","BL","SH",
+              "KN","LC","French part ","PM","VC","WS","SM","ST","SA","SN","RS","SC","SL","SG","Dutch part ","SK","SI","SB","SO","ZA",
+              "GS","SS","ES","LK","SD","SR","SJ","SZ","SE","CH","SY","TW","TJ","TZ","TH","TL","TG","TK","TO","TT","TN","TR","TM","TC",
+              "TV","UG","UA","AE","GB","US","UM","UY","UZ","VU","VE","VN","VG","VI","WF","EH","YE","ZM","ZW"
+          ]
+      },
+      "spreadsheetId": {
+          "title": "Google sheet ID (To get input data from Google sheet)",
+          "type": "string",
+          "description": "(Optional) Id of the google sheet from where search terms will be loaded.\n Spreadsheet must have only one column. Row 1 is considered the title of the column so it will not be loaded as a search term. Check the actor documentation for more info.",
+          "editor": "textfield",
+          "sectionCaption": "Advanced options"
+      },
+      "isPublic": {
+          "title": "Is the Google sheet public",
+          "type": "boolean",
+          "editor": "checkbox",
+          "description": "If checked you can import a public spreadsheet without need for authorization. For importing private sheets, please read about authorization in the actor documentation.",
+          "default": false
+      },
+      "category": {
+          "title": "Category of trends",
+          "type": "string",
+          "description": "Choose a category to filter the search for (defaults to 'All categories')",
+          "editor": "select",
+          "default": "",
+          "enumTitles": ["All categories", "Arts & Entertainment", "Autos & Vehicles", "Beauty & Fitness", "Books & Literature", "Business & Industrial", "Computers & Electronics",
+              "Finance", "Food & Drink", "Games", "Health", "Hobbies & Leisure", "Home & Garden", "Internet & Telecom", "Jobs & Education", "Law & Government", "News",
+              "Online Communities", "People & Society", "Pets & Animals", "Property", "Reference", "Science", "Shopping", "Sports", "Travel"],
+          "enum": ["", "3", "47", "44", "22", "12", "5", "7", "71", "8", "45", "65", "11", "13", "958", "19",
+              "16", "299", "14", "66", "29", "533", "174", "18", "20", "67"]
+      },
+      "maxItems": {
+          "title": "Max items",
+          "type": "integer",
+          "minimum": 0,
+          "description": "Limit of product items to be scraped. Zero value means no limit.",
+          "default": 0
+      },
+      "customTimeRange": {
+          "title": "Custom time range",
+          "type": "string",
+          "description": "Provide custom time range. If present, it takes precedence over regular timeRange. Format is: `YYYY-MM-DD YYYY-MM-DD`. See examples in the documentation.",
+          "editor": "textfield"
+      },
+      "extendOutputFunction": {
+          "title": "Extend output function",
+          "type": "string",
+          "editor": "javascript",
+          "description": "A function which result will get merged with the default result. It must return an object.",
+          "example": "($) => {\n    const result = {};\n    // Uncomment to add an extra field to each item of the output\n    // result.extraField = 'Test field';\n\n    return result;\n}"
+      },
+      "proxyConfiguration": {
+          "title": "Proxy configuration",
+          "type": "object",
+          "editor": "proxy",
+          "description": "The best option is usually Automatic proxy, but you can also use your own proxies or no proxy. It defaults to useApifyProxy. Country defaults to 'US'.",
+          "prefill": {
+              "useApifyProxy": true
+          }
+      },
+      "outputAsISODate": {
+          "title": "Output as ISO Date",
+          "description": "Outputs date column as an ISO date time string",
+          "default": false,
+          "type": "boolean"
+      },
+      "maxConcurrency": {
+          "title": "Max concurrency",
+          "type": "integer",
+          "minimum": 1,
+          "description": "How many pages will be opened in parallel if enough CPU is available.",
+          "default": 10,
+          "unit": "parallel pages"
+      },
+      "pageLoadTimeoutSecs": {
+          "title": "Page load timeout",
+          "type": "integer",
+          "minimum": 30,
+          "description": "How long it will wait for page loading before it abandons the loading and tries again.",
+          "default": 180,
+          "unit": "seconds"
+      }
+  },
+  "required": [
+      "proxyConfiguration"
+  ]
 }

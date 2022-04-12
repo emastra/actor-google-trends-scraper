@@ -1,7 +1,7 @@
 ## Features
 [Google Trends](https://trends.google.com/trends) does not have an API, but Google Trends Scraper creates an unofficial Google Trends API to let you extract data from Google Trends directly and at scale. It is built on the powerful [Apify SDK](https://sdk.apify.com/) and you can run it on the [Apify platform](https://my.apify.com) and locally.
 
-## Why scrape Google Trends?
+## Why scrape Google Trends with our API?
 Google Trends lets you find out what people have been searching for around the globe, as well as what ideas and fashions are just emerging. By analyzing this at scale, you can learn what to invest in, and where to spend your resources most effectively.
 
 Whether you’re a journalist researching hot topics, a real estate developer keeping an eye on future property values, an SEO expert tracking keywords, or an e-commerce retailer thriving on the edge with dropshipping, Google Trends has useful data for you.
